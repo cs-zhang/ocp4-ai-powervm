@@ -1,0 +1,19 @@
+- set_fact:
+    master_count: "{{ masters | length }}"
+    worker_count: "{{ workers | default([]) | length }}"
+
+- name: Monitor for agent based installer
+  when: install_type == "agent"
+  include: agent.yaml
+
+- name: Monitor for assisted installer
+  when: install_type == "assisted"
+  include: assisted.yaml
+
+- name: Monitor for SNO install
+  when: install_type == "sno"
+  include: sno.yaml
+
+- name: Post install process
+  when:  storage_type == "nfs"
+  include: post-nfs.yaml

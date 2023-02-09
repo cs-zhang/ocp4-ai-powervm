@@ -1,0 +1,10 @@
+
+- name: Remove existing named config
+  file:
+    path: /etc/dnsmasq.conf
+    state: absent
+
+- name: Remove existing grub.cfg
+  file:
+    path: /var/lib/tftpboot/boot/grub2/grub.cfg
+    state: absent

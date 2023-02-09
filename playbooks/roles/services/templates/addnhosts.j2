@@ -1,0 +1,19 @@
+{{ helper.ipaddr }} registry
+{% if masters | length == 1 %}
+{{ masters[0].ipaddr }} {{ masters[0].name }} api api-int
+{% else %}
+{% if dhcp.api_vip is defined %} 
+{{ dhcp.api_vip}} api api-int
+{% else %}
+{{ helper.ipaddr }} api api-int
+{% endif %}
+{% for m in masters %}
+{{ m.ipaddr }} {{ m.name | lower }}
+{% endfor %}
+{% if workers is defined and workers | length > 0 %}
+{% for w in workers %}
+{{ w.ipaddr }} {{ w.name }}
+{% endfor %}
+{% endif %}
+{% endif %}
+
