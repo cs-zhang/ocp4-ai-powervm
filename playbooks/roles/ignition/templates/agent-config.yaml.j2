@@ -1,0 +1,43 @@
+apiVersion: v1alpha1
+metadata:
+  name: {{ dns.clusterid }}
+rendezvousIP: {{ masters[0].ipaddr }}
+hosts:
+{% for m in masters %}
+  - hostname: {{ m.name }}
+    interfaces:
+       - name: eth0
+         macAddress: {{ m.macaddr }}
+    networkConfig:
+      interfaces:
+        - name: eth0
+          type: ethernet
+          state: up
+          mac-address: {{ m.macaddr }}
+          ipv4:
+            enabled: true
+            address:
+              - ip: {{ m.ipaddr }}
+                prefix-length: 24
+            dhcp: true
+{% endfor %}
+{% if workers is defined and workers | length > 0 %}
+{% for w in workers %}
+  - hostname: {{ w.name }}
+    interfaces:
+       - name: eth0
+         macAddress: {{ w.macaddr }}
+    networkConfig:
+      interfaces:
+        - name: eth0
+          type: ethernet
+          state: up
+          mac-address: {{ w.macaddr }}
+          ipv4:
+            enabled: true
+            address:
+              - ip: {{ w.ipaddr }}
+                prefix-length: 24
+            dhcp: true
+{% endfor %}
+{% endif %}

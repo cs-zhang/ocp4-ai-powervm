@@ -1,0 +1,77 @@
+  - name: Log into RH SSO API to get API_TOKEN
+    when: assisted_token is defined
+    block:
+    - name: Get access_token
+      uri:
+        url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+        body_format: form-urlencoded
+        method: POST
+        body:
+          grant_type: refresh_token
+          client_id: cloud-services
+          refresh_token: "{{ assisted_token }}"
+      register: token
+
+    - set_fact:
+        access_token: "Bearer {{ token.json.access_token }}"
+
+  - name: Set API_TOKEN in main
+    block:
+      - assert:
+          that: "{{ assisted_token is defined }}"
+      - set_fact:
+          api_token: "{{ access_token }}"
+    rescue:
+      - set_fact:
+          api_token: ""
+
+  - name: Generate cluster-create.json
+    template:
+      src: ../templates/assisted-create.json.j2
+      dest: "{{ workdir }}/assisted-create.json"
+
+
+  - name: Call to assisted service to create cluster
+    uri:
+      url: "{{ assisted_url }}/clusters"
+      method: POST
+      body_format: json
+      src: "{{ workdir }}/assisted-create.json"
+      headers:
+          Authorization: "{{ api_token }}"
+      status_code: 201
+    register: cluster_result
+
+  - name: Save create cluster output to file
+    copy: 
+      content:  "{{ cluster_result.json }}"
+      dest: "{{ workdir }}/assisted-create-output.json"
+
+  - set_fact:
+      assisted_cluster_id: "{{ cluster_result.json.id }}" 
+
+  - name: Generate assisted-register.json
+    template:
+      src: ../templates/assisted-register.json.j2
+      dest: "{{ workdir }}/assisted-register.json"
+ 
+  - name: Register the cluster infra-env to assisted service
+    uri:
+      url: "{{ assisted_url }}/infra-envs"
+      method: POST
+      body_format: json
+      src: "{{ workdir }}/assisted-register.json"
+      headers:
+          Authorization: "{{ api_token }}"
+      status_code: 201
+    register: register_result
+
+  - name: Save register cluster output to file
+    copy: 
+      content:  "{{ register_result.json }}"
+      dest: "{{ workdir }}/assisted-register-output.json"
+
+  - name: Download the discovery ISO
+    get_url:
+      url: "{{ register_result.json.download_url }}"
+      dest: "{{ workdir }}/{{install_type}}.iso"

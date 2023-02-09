@@ -1,0 +1,49 @@
+---
+# file: main.yml
+
+- hosts: localhost
+  vars_files:
+    - defaults/main.yaml
+  handlers:
+  - import_tasks: handlers/main.yml
+
+- name: Cleanup old files
+  hosts: localhost
+  gather_facts: false
+  any_errors_fatal: false
+  tasks:
+    - name: Clean up work directory
+      file: 
+        path: "{{ workdir }}/"
+        state: absent
+
+- name: Setup services for bastion
+  hosts: localhost
+  become: true
+  gather_facts: false
+  any_errors_fatal: true
+  roles:
+  - services
+
+- name: Create OCP ignition file
+  hosts: localhost
+  gather_facts: false
+  any_errors_fatal: true
+  tasks:
+  roles:
+  - ignition
+    
+- name: Net boot localhost cluster nodes
+  hosts: localhost
+  gather_facts: false
+  any_errors_fatal: true
+  roles:
+  - netboot
+
+- name: Monitor OCP installation progress
+  hosts: localhost
+  gather_facts: false
+  any_errors_fatal: true
+  roles:
+  - monitor
+

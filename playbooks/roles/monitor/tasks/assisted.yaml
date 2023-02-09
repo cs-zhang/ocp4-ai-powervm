@@ -1,0 +1,196 @@
+---
+- name: Log into RH SSO API to get API_TOKEN
+  when: assisted_token is defined
+  block:
+  - name: Get API_TOKEN
+    uri:
+      url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+      body_format: form-urlencoded
+      method: POST
+      body:
+        grant_type: refresh_token
+        client_id: cloud-services
+        refresh_token: "{{ assisted_token }}"
+    register: token
+
+  - name: Set API_TOKEN
+    set_fact:
+      access_token: "Bearer {{ token.json.access_token }}"
+
+- name: Set API_TOKEN in main 
+  block:
+    - assert:
+        that: "{{ assisted_token is defined }}"
+    - set_fact:
+        api_token: "{{ access_token }}"
+  rescue:
+    - set_fact:
+        api_token: ""
+
+- name: Show API_TOKEN
+  debug:
+    msg: "{{ api_token }}"
+
+- name: Get cluster info from output json file
+  set_fact:
+    cluster_info: '{{ lookup("file", "{{ workdir }}/assisted-create-output.json") | from_json }}'
+
+- name: Show cluster ID
+  debug:
+    msg: "{{ cluster_info.id }}"
+
+- name: Get cluster infraenv info from output json file
+  set_fact:
+    infraenv_info: '{{ lookup("file", "{{ workdir }}/assisted-register-output.json") | from_json }}'
+
+- name: Show cluster infraenv ID
+  debug:
+    msg: "{{ infraenv_info.id }}"
+
+- name: Show node count
+  debug:
+    msg: "master:{{ master_count }}, worker:{{ worker_count }}, total: {{ master_count | int + worker_count | int }}"
+
+- name: Call to all hosts info
+  uri:
+    url: "{{ assisted_url }}/infra-envs/{{ infraenv_info.id }}/hosts"
+    method: GET
+    body_format: json
+    return_content: yes
+    headers:
+      Authorization: "{{ api_token }}"
+    status_code: 200
+  register: hosts_result
+  until: (hosts_result.json | length) == (master_count | int + worker_count | int)
+  retries: 30
+  delay: 30
+
+  #- name: SHow hosts
+  #debug:
+  #  msg: "{{ hosts_result.json }}"
+
+- name: show host count
+  debug:
+    msg: "{{ hosts_result.json | length }}"
+
+- name: Get cluster status
+  uri:
+    url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}"
+    method: GET
+    body_format: json
+    return_content: yes
+    headers:
+      Authorization: "{{ api_token }}"
+    status_code: 200
+  register: status_1
+
+- name: Patch cluster
+  when: status_1.json.status == "pending-for-input" and masters | length > 1
+  block:
+  - name: Generate cluster-update.json
+    template:
+      src: ../templates/cluster-update.json.j2
+      dest: "{{ workdir }}/cluster-update.json"
+
+  - name: Update the cluster info to assisted service
+    uri:
+      url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}"
+      method: PATCH
+      body_format: json
+      src: "{{ workdir }}/cluster-update.json"
+      headers:
+          Authorization: "{{ api_token }}"
+      status_code: 201
+
+  - name: Update host roles
+    block:
+    - name: Get hosts info from infraenv
+      uri:
+        url: "{{ assisted_url }}/infra-envs/{{ infraenv_info.id }}/hosts"
+        method: GET
+        body_format: json
+        return_content: yes
+        headers:
+          Authorization: "{{ api_token }}"
+        status_code: 200
+      register: hosts
+    
+    - name: set role for masters
+      uri:
+        url: "{{ assisted_url }}/infra-envs/{{ infraenv_info.id }}/hosts/{{ hosts.json | json_query(query) | first }}"
+        method: PATCH
+        body_format: json
+        body: '{ "host_role": "master" }'
+        headers:
+          Authorization: "{{ api_token }}"
+        status_code: 201
+      vars:
+        query: "[?requested_hostname==`{{ item.name }}`].id"
+      with_items: "{{ masters }}"
+
+    - name: set role for workers
+      uri:
+        url: "{{ assisted_url }}/infra-envs/{{ infraenv_info.id }}/hosts/{{ hosts.json | json_query(query) | first }}"
+        method: PATCH
+        headers:
+          Authorization: "{{ api_token }}"
+        body_format: json
+        body: '{ "host_role": "worker" }'
+        status_code: 201
+      vars:
+        query: "[?requested_hostname==`{{ item.name }}`].id"
+      with_items: "{{ workers }}"
+      when: 
+        - workers is defined 
+        - workers | length > 0
+
+- name: Get cluster status
+  uri:
+      url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}"
+      method: GET
+      headers:
+          Authorization: "{{ api_token }}"
+      body_format: json
+      return_content: yes
+      status_code: 200
+  register: status_2
+  until: status_2.json.status == "ready" or status_2.json.status == "installing" or status_2.json.status == "installed"
+  retries: 30
+  delay: 30
+
+- name: Start installation
+  when: status_1.json.status == "ready" or status_2.json.status == "ready"
+  uri:
+    url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}/actions/install"
+    method: POST
+    headers:
+          Authorization: "{{ api_token }}"
+    body_format: json
+    return_content: yes
+    status_code: 202
+  register: install_status
+
+- name: Wait for installation completed
+  uri:
+    url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}"
+    method: GET
+    headers:
+          Authorization: "{{ api_token }}"
+    body_format: json
+    return_content: yes
+    status_code: 200
+  register: cluster_status
+  until: cluster_status.json.status == "installed"
+  retries: 100
+  delay: 60
+
+- name: Download kubeconfig
+  get_url:
+    url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}/downloads/credentials?file_name=kubeconfig"
+    dest: "{{ workdir }}/kubeconfig"
+
+- name: Download kubeadmin password
+  get_url:
+    url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}/downloads/credentials?file_name=kubeadmin-password"
+    dest: "{{ workdir }}/kubeadmin-password"
+

@@ -1,0 +1,15 @@
+{
+    "base_dns_domain": "{{ dns.domain | lower }}",
+    "name": "{{ dns.clusterid }}",
+    "cpu_architecture": "{{ rhcos_arch }}",
+    "openshift_version": "{{ assisted_ocp_version }}",
+    {% if masters | length == 1 %}
+    "high_availability_mode": "None",
+    {% else %}
+    "high_availability_mode": "Full",
+    {% endif %}
+    "network_type": "{{ cni_network_provider }}",
+    "ssh_public_key": "{{ public_ssh_key }}",
+    "pull_secret": {{ pull_secret | to_json }}
+}
+

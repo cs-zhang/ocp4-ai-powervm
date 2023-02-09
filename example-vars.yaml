@@ -1,0 +1,125 @@
+---
+helper:
+  name: "helper"
+  ipaddr: "192.168.79.2"
+  #networkifacename: "env34"
+dns:
+  domain: "ai.io"
+  clusterid: "ocp"
+  forwarder1: "9.9.9.9"
+  forwarder2: "8.8.4.4"
+dhcp:
+  router: "192.168.79.2"
+  netmask: "255.255.255.0"
+  subnet: "192.168.79.0/24"
+  api_vip: "192.168.79.5"
+  ingress_vip: "192.168.79.4"
+masters:
+  - name: "master-1"
+    ipaddr: "192.168.79.98"
+    macaddr: "02:4f:9e:42:b4:02"
+    pvmcec: Server-9080-HEX-SN786E288
+    pvmlpar: cp1-master-1
+  - name: "master-2"
+    ipaddr: "192.168.79.99"
+    macaddr: "02:4f:97:3d:02:02"
+    pvmcec: Server-9080-HEX-SN786E288
+    pvmlpar: cp1-master-2
+  - name: "master-3"
+    ipaddr: 192.168.79.100"
+    macaddr: "02:4f:9c:68:0d:02"
+    pvmcec: Server-9080-HEX-SN786E288
+    pvmlpar: cp1-master-3
+
+force_ocp_download: true
+######################
+# URL path to RHCOS download site
+rhcos_arch: "ppc64le"
+rhcos_base_url: "https://mirror.openshift.com/pub/openshift-v4/{{ rhcos_arch }}/dependencies/rhcos"
+######################
+# RHCOS server for OCP
+# for Night build
+# rhcos_rhcos_base: "pre-release"
+# rhcos_rhcos_tag: "45.82.202006191459-0"
+# for release build
+rhcos_rhcos_base: "4.12"
+rhcos_rhcos_tag: "latest"
+rhcos_iso: "{{ rhcos_base_url}}/{{ rhcos_rhcos_base }}/{{ rhcos_rhcos_tag }}/rhcos-live.{{ rhcos_arch }}.iso"
+rhcos_rootfs: "{{ ocp_base_url}}/{{ ocp_rhcos_base }}/{{ ocp_rhcos_tag }}/rhcos-live-rootfs.{{ rhcos_arch }}.img"
+rhcos_initramfs: "{{ ocp_base_url}}/{{ ocp_rhcos_base }}/{{ ocp_rhcos_tag }}/rhcos-live-initramfs.{{ rhcos_arch }}.img"
+rhcos_kernel: "{{ ocp_base_url}}/{{ ocp_rhcos_base }}/{{ ocp_rhcos_tag }}/rhcos-live-kernel-{{ rhcos_arch }}"
+########################
+# URL path to OCP clients download site
+ocp_client_arch: "ppc64le"
+ocp_base_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ocp_client_arch }}/clients"
+# Client/install for OCP
+# for night build
+#ocp_client_base: "ocp-dev-preview"
+#ocp_client_tag: "4.7.0-0.nightly-ppc64le-2020-11-05-164124"
+# for release build
+ocp_client_base: "ocp"
+ocp_client_tag: "latest-4.12"
+ocp_client: "{{ ocp_base_url}}/{{ ocp_client_base }}/{{ ocp_client_tag }}/openshift-client-linux.tar.gz"
+ocp_installer: "{{ ocp_base_url}}/{{ ocp_client_base }}/{{ ocp_client_tag }}/openshift-install-linux.tar.gz"
+
+########################
+# local registry
+setup_registry:
+  deploy: false
+  autosync_registry: true
+  registry_image: docker.io/ibmcom/registry-ppc64le:2.6.2.5
+  local_repo: "ocp4/openshift4"
+  product_repo: "openshift-release-dev"
+  release_name: "ocp-release"
+  release_tag: "4.12.0-ppc64le"
+
+##########################################################
+# Variables defined for used by ocp4-upi-powervm-playbooks
+# pvmcec : The physical machine where the LPAR(node) is running on
+# pvmlpar: The LPAR(node) name in HMC
+### Note: pvmcec and pvmlpar are required for all cluster nodes defined in this vars.yaml file
+# pvm_hmc : The HMC host IP and user, it is used to run HMC CLI remotely, the helper need to be able to ssh to HMC without a password
+##########################################################
+pvm_hmc: <hmc_user>@<hmc_host>
+
+###################################
+# define the deployment type:
+# install_type: agent | assisted | sno
+#   agent: agent based installer
+#   assisted: assisted installer
+#   sno: normal OCP SNO installation
+install_type: assisted
+
+#####################################
+# variables defined for assisted installer
+# assisted_url: define the assisted service access point
+# assisted_token: offline token for secure assisted service access, optional
+# assisted_ocp_version: OCP version to install
+# assisted_rhcos_version: RHCOS version to install
+assisted_url: http://9.47.87.83:8090/api/assisted-install/v2
+#assisted_token: ""
+assisted_ocp_version: "4.12.0"
+assisted_rhcos_version: "4.12"
+
+####################################
+pull_secret: '{{ lookup("file", "~/.openshift/pull-secret") | from_json | to_json }}'
+public_ssh_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+# need to use absolute path for workdir
+workdir: "/home/cloud-user/ocp4-{{ install_type }}"
+log_level: info
+
+###################################
+# optional variables
+#release_image_override: quay.io/openshift-release-dev/ocp-release:4.12.0-ppc64le
+#cni_network_provider: OpenShiftSDN
+#openshift_installer: "~/ocp-ipi/ocp-agent/openshift-install"
+
+###################################
+# storage_type could be: "" or "nfs"
+#storage_type: nfs
+
+##################################
+# setup the predefined proxy
+#proxy_url: http://192.168.79.2:3128
+#no_proxy: 127.0.0.0/16

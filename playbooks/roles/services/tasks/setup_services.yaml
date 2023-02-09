@@ -1,0 +1,145 @@
+---
+# tasks file for config services
+  - name: Install needed packages
+    package:
+      name: "{{ packages }}"
+      state: present
+
+  - name: Remove existing config files
+    import_tasks: remove_old_config_files.yaml
+    #when: remove_old_config_files
+
+  - name: Write out dnsmasq's addnhosts file
+    template:
+      src: ../templates/addnhosts.j2
+      dest: /etc/dnsmasq.d/addnhosts
+
+  - name: Write out dnsmasq config file
+    template:
+      src: ../templates/dnsmasq.conf.j2
+      dest: /etc/dnsmasq.conf
+    notify:
+      - restart dnsmasq
+
+  - name: Write out haproxy config file
+    template:
+      src: ../templates/haproxy.cfg.j2
+      dest: /etc/haproxy/haproxy.cfg
+    notify:
+      - restart haproxy
+    when: masters | length > 1 and ( dhcp.api_vip is not defined or dhcp.ingress_vip is not defined )
+    
+  - name: Set HTTP server and prepare OCP4 bios
+    block:
+    - name: Copy httpd conf file
+      template:
+        src: ../templates/httpd.conf.j2
+        dest: /etc/httpd/conf/httpd.conf
+      notify:
+        - restart httpd
+
+  - name: Create apache directories for installing
+    file:
+        path: "{{ item }}"
+        state: directory
+        mode: 0755
+    with_items:
+        - /var/www/html/install
+        - /var/www/html/ignition
+
+  - name: generate netboot entry for grub2
+    shell: grub2-mknetdir --net-directory=/var/lib/tftpboot
+
+  - name: Create TFTP RHCOS dir
+    file:
+      path: /var/lib/tftpboot/rhcos
+      state: directory
+      mode: 0755
+ 
+  - name: Generate grub2 config files
+    block:
+    - name: create grub.cfg
+      copy:
+        dest: /var/lib/tftpboot/boot/grub2/grub.cfg
+        content: |
+          default=0
+          fallback=1
+          timeout=1
+    - name: generate grub entry (masters)
+      vars:
+        mac: "{{ item.macaddr }}"
+      include_tasks: generate_grub.yaml
+      with_items: "{{ masters }}"
+    - name: generate grub entry (workers)
+      vars:
+        mac: "{{ item.macaddr }}"
+      include_tasks: generate_grub.yaml
+      with_items: "{{ workers }}"
+      when:
+        - workers is defined
+        - workers | length > 0
+        
+  - name: Create NFS export directory
+    file:
+      path: /export
+      state: directory
+      mode: 0777
+      owner: "{{ owner }}"
+      group: "{{ group }}"
+    notify:
+      - restart nfs
+
+  - name: Copy NFS export conf file
+    copy:
+      src: ../files/nfs-exports
+      dest: /etc/exports
+    notify:
+      - restart nfs
+
+  - name: Copying over nfs-provisioner rbac
+    copy:
+      src: ../files/nfs-provisioner-rbac.yaml
+      dest: /usr/local/src/nfs-provisioner-rbac.yaml
+      owner: root
+      group: root
+      mode: 0666
+
+  - name: Copying over nfs-provisioner deployment
+    template:
+      src: ../templates/nfs-provisioner-deployment.yaml.j2
+      dest: /usr/local/src/nfs-provisioner-deployment.yaml
+      owner: root
+      group: root
+      mode: 0666
+
+  - name: Copying over nfs-provisioner storageclass
+    copy:
+      src: ../files/nfs-provisioner-sc.yaml
+      dest: /usr/local/src/nfs-provisioner-sc.yaml
+      owner: root
+      group: root
+      mode: 0666
+
+  - name: Copying over nfs-provisioner setup script
+    copy:
+      src: ../files/nfs-provisioner-setup.sh
+      dest: /usr/local/bin/nfs-provisioner-setup.sh
+      owner: root
+      group: root
+      mode: 0555
+
+  - name: Copying over a sample PVC file for NFS
+    copy:
+      src: ../files/registry-pvc.yaml
+      dest: /usr/local/src/registry-pvc.yaml
+      mode: '0555'
+
+  - name: Copy info script over
+    template:
+      src: ../templates/checker.sh.j2
+      dest: /usr/local/bin/helpernodecheck
+      owner: root
+      group: root
+      mode: 0555
+
+      
