@@ -58,6 +58,11 @@
  
   - name: Generate grub2 config files
     block:
+    - set_fact:
+        install_url: "http://{{ helper.ipaddr }}:{{ http_port }}/install"
+        ignition_url: "http://{{ helper.ipaddr }}:{{ http_port }}/ignition"
+        coreos_inst_url: "coreos.live.rootfs_url=http://{{ helper.ipaddr }}:{{ http_port }}/install/rootfs.img"    
+
     - name: create grub.cfg
       copy:
         dest: /var/lib/tftpboot/boot/grub2/grub.cfg
@@ -65,20 +70,53 @@
           default=0
           fallback=1
           timeout=1
+    - name: generate grub entry (bootstrap)
+      vars:
+        role: bootstrap
+        ignition: "{{ install_type }}.ign"
+        name: "{{ bootstrap.name }}"
+        mac: "{{ bootstrap.macaddr }}"
+        mdisk: "{{ bootstrap.disk | default( disk ) }}"
+        multipath: ""
+      include_tasks: generate_grub.yaml
+      when: bootstrap is defined
     - name: generate grub entry (masters)
       vars:
+        role: master
+        ignition: "{{ install_type }}.ign"
+        name: "{{ item.name }}"
         mac: "{{ item.macaddr }}"
+        mdisk: "{{ item.disk | default( disk ) }}"
+        multipath: "{{ item.multipath | default('') }}"
       include_tasks: generate_grub.yaml
       with_items: "{{ masters }}"
     - name: generate grub entry (workers)
       vars:
+        role: worker
+        ignition: "{{ install_type }}.ign"
+        name: "{{ item.name }}"
         mac: "{{ item.macaddr }}"
+        mdisk: "{{ item.disk | default( disk ) }}"
+        multipath: "{{ item.multipath | default('') }}"
       include_tasks: generate_grub.yaml
       with_items: "{{ workers }}"
       when:
         - workers is defined
         - workers | length > 0
-        
+    - name: generate grub entry (day2_workers)
+      vars:
+        role: worker
+        ignition: "day2-{{ install_type }}.ign"
+        name: "{{ item.name }}"
+        mac: "{{ item.macaddr }}"
+        mdisk: "{{ item.disk | default( disk ) }}"
+        multipath: "{{ item.multipath | default('') }}"
+      include_tasks: generate_grub.yaml
+      with_items: "{{ day2_workers }}"
+      when:
+        - day2_workers is defined
+        - day2_workers | length > 0        
+
   - name: Create NFS export directory
     file:
       path: /export

@@ -22,7 +22,7 @@ networking:
   serviceNetwork:
   - 172.30.0.0/16
 platform:
-{% if masters | length == 1 %}
+{% if (masters | length == 1 and install_type != "normal") or install_type == "normal" %}
   none: {}
 {% else %}
   baremetal:

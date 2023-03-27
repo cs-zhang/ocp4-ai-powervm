@@ -1,0 +1,7 @@
+---
+# Boot up day2 worker nodes
+
+- hosts: all    
+  tasks:
+  - name: Netboot all day2 workers
+    include_tasks: roles/day2/tasks/netboot.yaml

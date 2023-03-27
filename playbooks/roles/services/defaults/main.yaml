@@ -11,3 +11,5 @@ cni_network_provider: OVNKubernetes
 storage_type: ""
 node_connection_timeout: 2700
 http_port: 8000
+disk: /dev/sda
+force_ocp_download: false

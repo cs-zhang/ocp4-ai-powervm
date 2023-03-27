@@ -1,0 +1,7 @@
+---
+# defaults file
+
+rhcos_arch: ppc64le
+ocp_client_arch: ppc64le
+kubeconfig_file: "{{ workdir}}/kubeconfig"
+assisted_token: ""
