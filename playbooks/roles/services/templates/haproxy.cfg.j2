@@ -76,6 +76,9 @@ backend openshift-api-server
 {% for m in masters %}
     server {{ m.name | lower }} {{ m.ipaddr }}:6443 check
 {% endfor %}
+{% if bootstrap is defined %}
+    server {{ bootstrap.name | lower }} {{ bootstrap.ipaddr }}:6443 check
+{% endfor %}
 
 frontend machine-config-server
     bind *:22623
@@ -87,6 +90,9 @@ backend machine-config-server
 {% for m in masters %}
     server {{ m.name | lower }} {{ m.ipaddr }}:22623 check
 {% endfor %}
+{% if bootstrap is defined %}
+    server {{ bootstrap.name | lower }} {{ bootstrap.ipaddr }}:6443 check
+{% endfor %}
 
 frontend ingress-http
     bind *:80
@@ -95,13 +101,19 @@ frontend ingress-http
 
 backend ingress-http
     balance source
-{% if workers is defined %}
+{% if workers is defined and workers | length > 0 %}
 {% for w in workers %}
     server {{ w.name | lower }}-http-router{{ loop.index0 }} {{ w.ipaddr }}:80 check
 {% endfor %}
-{% else %}
+{% endif %}
+{% if workers is defined and workers | length < 2 %}
 {% for m in masters %}
     server {{ m.name | lower }}-http-router{{ loop.index0 }} {{ m.ipaddr }}:80 check
+{% endfor %}
+{% endif %}
+{% if day2_workers is defined and day2_workers | length > 0 %}
+{% for w in day2_workers %}
+    server {{ w.name | lower }}-https-router{{ loop.index0 }} {{ w.ipaddr }}:80 check
 {% endfor %}
 {% endif %}
 
@@ -112,16 +124,21 @@ frontend ingress-https
 
 backend ingress-https
     balance source
-{% if workers is defined %}
+{% if workers is defined and workers | length > 0 %}
 {% for w in workers %}
     server {{ w.name | lower }}-https-router{{ loop.index0 }} {{ w.ipaddr }}:443 check
 {% endfor %}
-{% else %}
+{% endif %}
+{% if workers is defined and workers | length < 2 %}
 {% for m in masters %}
     server {{ m.name | lower }}-https-router{{ loop.index0 }} {{ m.ipaddr }}:443 check
 {% endfor %}
 {% endif %}
-
+{% if day2_workers is defined and day2_workers | length > 0 %}
+{% for w in day2_workers %}
+    server {{ w.name | lower }}-https-router{{ loop.index0 }} {{ w.ipaddr }}:443 check
+{% endfor %}
+{% endif %}
 
 #---------------------------------------------------------------------
 

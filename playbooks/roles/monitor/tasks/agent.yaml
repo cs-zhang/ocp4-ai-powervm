@@ -82,7 +82,8 @@
       vars:
         query: "[?requested_hostname==`{{ item.name }}`].id"
       with_items: "{{ masters }}"
-
+      when: masters | length > 1
+      
     - name: set role for workers
       uri:
         url: "{{ api_url }}/infra-envs/{{ infraenv_id }}/hosts/{{ hosts.json | json_query(query) | first }}"

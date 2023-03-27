@@ -31,11 +31,11 @@
   include: assisted.yaml
 
 - name: Setup for SNO install
-  when: install_type == "sno"
+  when: (install_type == "sno") or (install_type == "normal")
   include: sno.yaml
 
 - name: Get pxe files and ignition from ISO and copy to right place
-  when: install_type != "sno"
+  when: (install_type == "agent") or (install_type == "assisted")
   block:
   - name: Get pxe and ignition from ISO
     shell: |

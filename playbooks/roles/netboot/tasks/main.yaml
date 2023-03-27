@@ -1,5 +1,17 @@
 ---
 # tasks file for netboot nodes
+- name: netboot bootstrap node
+  when: bootstrap is defined
+  shell: |
+    orig_mac={{ bootstrap.macaddr }}
+    pvm_mac=`echo ${orig_mac//:}`
+    pvmcec={{ bootstrap.pvmcec }}
+    pvmlpar={{ bootstrap.pvmlpar }}
+    pvm_profile=`ssh -o StrictHostKeyChecking=no {{ pvm_hmc }} "lssyscfg -r lpar -m ${pvmcec} --filter lpar_names=${pvmlpar} -F curr_profile"`
+    remote_cmd="lpar_netboot -i -D -f -t ent -m ${pvm_mac} -s auto -d auto -S {{ helper.ipaddr }} -C {{ bootstrap.ipaddr }} -G {{ dhcp.router }}  ${pvmlpar} ${pvm_profile} ${pvmcec}"
+    ssh -o StrictHostKeyChecking=no {{ pvm_hmc }} "${remote_cmd}"
+  register: bootstrap_output
+
 - name: netboot masters nodes
   shell: |
     orig_mac={{ item.macaddr }}

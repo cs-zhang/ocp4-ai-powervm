@@ -1,35 +1,6 @@
 ---
-- name: Log into RH SSO API to get API_TOKEN
-  when: assisted_token is defined
-  block:
-  - name: Get API_TOKEN
-    uri:
-      url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
-      body_format: form-urlencoded
-      method: POST
-      body:
-        grant_type: refresh_token
-        client_id: cloud-services
-        refresh_token: "{{ assisted_token }}"
-    register: token
-
-  - name: Set API_TOKEN
-    set_fact:
-      access_token: "Bearer {{ token.json.access_token }}"
-
-- name: Set API_TOKEN in main 
-  block:
-    - assert:
-        that: "{{ assisted_token is defined }}"
-    - set_fact:
-        api_token: "{{ access_token }}"
-  rescue:
-    - set_fact:
-        api_token: ""
-
-- name: Show API_TOKEN
-  debug:
-    msg: "{{ api_token }}"
+- name: Get access Token
+  include_tasks: ../../ignition/tasks/assisted-refresh-token.yaml
 
 - name: Get cluster info from output json file
   set_fact:
@@ -165,12 +136,14 @@
     method: POST
     headers:
           Authorization: "{{ api_token }}"
-    body_format: json
     return_content: yes
     status_code: 202
   register: install_status
+  until: install_status.status == 202
+  delay: 20
+  retries: 15
 
-- name: Wait for installation completed
+- name: Waiting for installation start
   uri:
     url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}"
     method: GET
@@ -180,17 +153,67 @@
     return_content: yes
     status_code: 200
   register: cluster_status
-  until: cluster_status.json.status == "installed"
-  retries: 100
-  delay: 60
+  until: cluster_status.json.status == "installing"
+  retries: 30
+  delay: 15
 
 - name: Download kubeconfig
   get_url:
     url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}/downloads/credentials?file_name=kubeconfig"
     dest: "{{ workdir }}/kubeconfig"
+    headers:
+      Authorization: "{{ api_token }}"
 
 - name: Download kubeadmin password
   get_url:
     url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}/downloads/credentials?file_name=kubeadmin-password"
     dest: "{{ workdir }}/kubeadmin-password"
+    headers:
+      Authorization: "{{ api_token }}"
+
+- name: Download OpenShift bare metal cluster install-config.yaml.
+  get_url:
+    url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}/downloads/files?file_name=install-config.yaml"
+    dest: "{{ workdir }}/install-config.yaml"
+    headers:
+      Authorization: "{{ api_token }}"
+    
+
+- name: Check if Cluster is installed
+  block:
+    - name: Is Cluster Installed
+      uri:
+        url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}"
+        method: GET
+        headers:
+          accept: application/json
+          Authorization: "{{ api_token }}}"
+        return_content: yes
+        status_code: 200
+        validate_certs: "{{ assisted_token != '' }}"
+      register: ocpcluster
+      until: >
+        ocpcluster.json.status == 'installed' or
+        ocpcluster.json.status == 'error' or
+        ocpcluster.json.status == 'insufficient' or
+        ocpcluster.json.status == 'installing-pending-user-action'
+      delay: 60
+      retries: 100
+      failed_when: >
+        ocpcluster.json.status == 'error' or
+        ocpcluster.json.status == 'insufficient' or
+        ocpcluster.json.status == 'installing-pending-user-action'
+
+  rescue:
+    - name: Refresh access Token
+      include_tasks: ../../ignition/tasks/assisted-refresh-token.yaml
+      when: ocpcluster.status|default('None') != 200 and assisted_token != ""
+
+    - name: Fail if cluster wasn't installed successfully
+      fail:
+        msg: "Cluster failed to install. Cluster ended up with status: {{ ocpcluster.json.status }}"
+      when:
+        - ocpcluster.status|default('None') == 200
+        - ocpcluster.json.status|default('None') != 'installed'
+
 

@@ -1,29 +1,5 @@
-  - name: Log into RH SSO API to get API_TOKEN
-    when: assisted_token is defined
-    block:
-    - name: Get access_token
-      uri:
-        url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
-        body_format: form-urlencoded
-        method: POST
-        body:
-          grant_type: refresh_token
-          client_id: cloud-services
-          refresh_token: "{{ assisted_token }}"
-      register: token
-
-    - set_fact:
-        access_token: "Bearer {{ token.json.access_token }}"
-
-  - name: Set API_TOKEN in main
-    block:
-      - assert:
-          that: "{{ assisted_token is defined }}"
-      - set_fact:
-          api_token: "{{ access_token }}"
-    rescue:
-      - set_fact:
-          api_token: ""
+  - name: Get access Token
+    include_tasks: assisted-refresh-token.yaml
 
   - name: Generate cluster-create.json
     template:
@@ -71,7 +47,56 @@
       content:  "{{ register_result.json }}"
       dest: "{{ workdir }}/assisted-register-output.json"
 
+  - name: Patch discovery ignition
+    when: ("api.integration" in assisted_url)
+    block:
+      - name: Copy registries.conf
+        template: 
+          src:  ../templates/registries.conf.j2
+          dest: "{{ workdir }}/registries.conf"
+      
+      - name: Generate agent-config.yaml
+        template:
+          src: ../templates/discovery-ignition.json.j2
+          dest: "{{ workdir }}/discovery-ignition.json"
+
+      - name: Create the patch config
+        shell: |
+          base64 -w0 registries.conf > registries.conf.b64
+          sed -i "s/BASE64_ENCODED_REGISTRY_CONF/$(cat registries.conf.b64)/" discovery-ignition.json
+        args:
+          chdir: "{{ workdir }}"
+
+      - name: Patch the discovery ignition
+        uri:
+          url: "{{ assisted_url }}/infra-envs/{{ register_result.json.id }}"
+          method: PATCH
+          body_format: json
+          src: "{{ workdir }}/discovery-ignition.json"
+          headers:
+              Authorization: "{{ api_token }}"
+          status_code: 201
+
+  - name: Get Infraenv info after patch
+    uri:
+      url: "{{ assisted_url }}/infra-envs/{{ register_result.json.id }}"
+      method: GET
+      body_format: json
+      return_content: yes
+      headers:
+        Authorization: "{{ api_token }}"
+      status_code: 200
+    register: infraenv_result2
+
+  - name: Save register cluster output to file
+    copy: 
+      content:  "{{ infraenv_result2.json }}"
+      dest: "{{ workdir }}/assisted-patched-output.json"
+
   - name: Download the discovery ISO
     get_url:
-      url: "{{ register_result.json.download_url }}"
+      url: "{{ infraenv_result2.json.download_url }}"
       dest: "{{ workdir }}/{{install_type}}.iso"
+      headers:
+        Authorization: "{{ api_token }}"
+      force: yes
