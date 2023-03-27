@@ -57,7 +57,7 @@ masters:
 #     pvmcec: "C340F21U13"
 #     pvmlpar: "cs-ocp-sno-89bf5d67-000072d1"
 
-force_ocp_download: true
+force_ocp_download: false
 ######################
 # URL path to RHCOS download site
 rhcos_arch: "ppc64le"
@@ -112,8 +112,15 @@ install_type: assisted
 # assisted_token: offline token for secure assisted service access, optional
 # assisted_ocp_version: OCP version to install
 # assisted_rhcos_version: RHCOS version to install
+#####################################
+# for local assisted service
 assisted_url: http://9.47.87.83:8090/api/assisted-install/v2
-#assisted_token: ""
+# for official AI service:
+#assisted_url: "https://api.openshift.com/api/assisted-install/v2" 
+# for RH integration AI service:
+#assisted_url: "https://api.integration.openshift.com/api/assisted-install/v2"
+# offline token for AI service
+#assisted_token: "eyJhbGciOiJIUzI1NiIs........."
 assisted_ocp_version: "4.12.0"
 assisted_rhcos_version: "4.12"
 
