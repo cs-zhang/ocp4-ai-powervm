@@ -20,12 +20,6 @@
     {% else %}
     "network_type": "OpenShiftSDN",
     "user_managed_networking": true,
-    "machine_networks": [
-        {
-        "cidr": "{{ dhcp.subnet }}",
-        "cluster_id": "{{ cluster_info.id }}"
-      }
-    ],
     {% endif %}
     "service_networks": [
       {

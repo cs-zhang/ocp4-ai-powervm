@@ -106,7 +106,7 @@
     - name: generate grub entry (day2_workers)
       vars:
         role: worker
-        ignition: "day2-{{ install_type }}.ign"
+        ignition: "{{ install_type }}-day2.ign"
         name: "{{ item.name }}"
         mac: "{{ item.macaddr }}"
         mdisk: "{{ item.disk | default( disk ) }}"

@@ -125,8 +125,9 @@ assisted_ocp_version: "4.12.0"
 assisted_rhcos_version: "4.12"
 
 ####################################
-pull_secret: '{{ lookup("file", "~/.openshift/pull-secret") | from_json | to_json }}'
-public_ssh_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+# the default place for pull-secret and id_rsa.pub
+# pull_secret: '{{ lookup("file", "~/.openshift/pull-secret") | from_json | to_json }}'
+# public_ssh_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 
 # need to use absolute path for workdir
 workdir: "/home/cloud-user/ocp4-{{ install_type }}"
