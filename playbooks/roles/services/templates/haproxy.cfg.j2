@@ -78,7 +78,7 @@ backend openshift-api-server
 {% endfor %}
 {% if bootstrap is defined %}
     server {{ bootstrap.name | lower }} {{ bootstrap.ipaddr }}:6443 check
-{% endfor %}
+{% endif %}
 
 frontend machine-config-server
     bind *:22623
@@ -92,7 +92,7 @@ backend machine-config-server
 {% endfor %}
 {% if bootstrap is defined %}
     server {{ bootstrap.name | lower }} {{ bootstrap.ipaddr }}:6443 check
-{% endfor %}
+{% endif %}
 
 frontend ingress-http
     bind *:80
@@ -106,14 +106,19 @@ backend ingress-http
     server {{ w.name | lower }}-http-router{{ loop.index0 }} {{ w.ipaddr }}:80 check
 {% endfor %}
 {% endif %}
-{% if workers is defined and workers | length < 2 %}
+{% if workers is not defined or workers | length < 2 %}
 {% for m in masters %}
     server {{ m.name | lower }}-http-router{{ loop.index0 }} {{ m.ipaddr }}:80 check
 {% endfor %}
 {% endif %}
+{% if workers is defined and workers | length < 2 %}
+{% for w in workers %}
+    server {{ w.name | lower }}-http-router{{ loop.index0 }} {{ w.ipaddr }}:80 check
+{% endfor %}
+{% endif %}
 {% if day2_workers is defined and day2_workers | length > 0 %}
 {% for w in day2_workers %}
-    server {{ w.name | lower }}-https-router{{ loop.index0 }} {{ w.ipaddr }}:80 check
+    server {{ w.name | lower }}-http-router{{ loop.index0 }} {{ w.ipaddr }}:80 check
 {% endfor %}
 {% endif %}
 
@@ -129,9 +134,14 @@ backend ingress-https
     server {{ w.name | lower }}-https-router{{ loop.index0 }} {{ w.ipaddr }}:443 check
 {% endfor %}
 {% endif %}
-{% if workers is defined and workers | length < 2 %}
+{% if workers is not defined or workers | length < 2 %}
 {% for m in masters %}
     server {{ m.name | lower }}-https-router{{ loop.index0 }} {{ m.ipaddr }}:443 check
+{% endfor %}
+{% endif %}
+{% if workers is defined and workers | length < 2 %}
+{% for w in workers %}
+    server {{ w.name | lower }}-https-router{{ loop.index0 }} {{ w.ipaddr }}:443 check
 {% endfor %}
 {% endif %}
 {% if day2_workers is defined and day2_workers | length > 0 %}
@@ -139,6 +149,7 @@ backend ingress-https
     server {{ w.name | lower }}-https-router{{ loop.index0 }} {{ w.ipaddr }}:443 check
 {% endfor %}
 {% endif %}
+
 
 #---------------------------------------------------------------------
 

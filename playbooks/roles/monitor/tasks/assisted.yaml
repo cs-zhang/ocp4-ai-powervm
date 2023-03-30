@@ -44,6 +44,20 @@
   debug:
     msg: "{{ hosts_result.json | length }}"
 
+- name: wait hosts have been added to Assistance Installer
+  uri:
+    url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}"
+    method: GET
+    body_format: json
+    return_content: yes
+    headers:
+      Authorization: "{{ api_token }}"
+    status_code: 200
+  register: ocpcluster
+  until: ocpcluster.json.host_networks is defined
+  delay: 20
+  retries: 50
+
 - name: Get cluster status
   uri:
     url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}"
@@ -53,10 +67,17 @@
     headers:
       Authorization: "{{ api_token }}"
     status_code: 200
-  register: status_1
+  register: ocpcluster
+  until: ocpcluster.json.host_networks|length > 0 and ocpcluster.json.status != "insufficient"
+  delay: 20
+  retries: 50
+
+- name: Print out ocpcluster.json.status
+  debug:
+    msg: "{{ ocpcluster.json.status }}"
 
 - name: Patch cluster
-  when: status_1.json.status == "pending-for-input" and masters | length > 1
+  when: (ocpcluster.json.status == "pending-for-input" or ocpcluster.json.status == "ready") and masters | length > 1
   block:
   - name: Generate cluster-update.json
     template:
@@ -130,7 +151,7 @@
   delay: 30
 
 - name: Start installation
-  when: status_1.json.status == "ready" or status_2.json.status == "ready"
+  when: ocpcluster.json.status == "ready" or status_2.json.status == "ready"
   uri:
     url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}/actions/install"
     method: POST
@@ -178,6 +199,8 @@
     headers:
       Authorization: "{{ api_token }}"
     
+- name: Refresh access Token
+  include_tasks: ../../ignition/tasks/assisted-refresh-token.yaml
 
 - name: Check if Cluster is installed
   block:
@@ -187,7 +210,7 @@
         method: GET
         headers:
           accept: application/json
-          Authorization: "{{ api_token }}}"
+          Authorization: "{{ api_token }}"
         return_content: yes
         status_code: 200
         validate_certs: "{{ assisted_token != '' }}"

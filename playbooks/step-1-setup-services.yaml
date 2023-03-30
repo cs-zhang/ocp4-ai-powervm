@@ -1,16 +1,6 @@
 ---
 # file: main.yml
 
-- name: Cleanup old files
-  hosts: localhost
-  gather_facts: false
-  any_errors_fatal: false
-  tasks:
-    - name: Clean up work directory
-      file: 
-        path: "{{ workdir }}/"
-        state: absent
-
 - name: Setup services for bastion
   hosts: localhost
   become: true

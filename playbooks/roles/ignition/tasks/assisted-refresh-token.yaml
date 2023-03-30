@@ -15,7 +15,7 @@
 
   - name: Set API_TOKEN
     set_fact:
-      access_token: "{{ token.json | json_query(jmesquery) }}"
+      access_token: "Bearer {{ token.json | json_query(jmesquery) }}"
     vars:
       jmesquery: "access_token"
 
@@ -29,6 +29,6 @@
     - set_fact:
         api_token: ""
 
-- name: Show API_TOKEN
-  debug:
-    msg: "{{ api_token }}"
+# - name: Show API_TOKEN
+#   debug:
+#     msg: "{{ api_token }}"
