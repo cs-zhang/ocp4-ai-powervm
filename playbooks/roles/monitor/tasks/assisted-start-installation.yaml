@@ -1,0 +1,62 @@
+- name: Get cluster status
+  uri:
+      url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}"
+      method: GET
+      headers:
+          Authorization: "{{ api_token }}"
+      body_format: json
+      return_content: yes
+      status_code: 200
+  register: status_2
+  until: status_2.json.status == "ready" or status_2.json.status == "installing" or status_2.json.status == "installed"
+  retries: 30
+  delay: 30
+
+- name: Start installation
+  when: ocpcluster.json.status == "ready" or status_2.json.status == "ready"
+  uri:
+    url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}/actions/install"
+    method: POST
+    headers:
+          Authorization: "{{ api_token }}"
+    return_content: yes
+    status_code: 202
+  register: install_status
+  until: install_status.status == 202
+  delay: 20
+  retries: 15
+
+- name: Waiting for installation start
+  uri:
+    url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}"
+    method: GET
+    headers:
+          Authorization: "{{ api_token }}"
+    body_format: json
+    return_content: yes
+    status_code: 200
+  register: cluster_status
+  until: cluster_status.json.status == "installing"
+  retries: 30
+  delay: 15
+
+- name: Download kubeconfig
+  get_url:
+    url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}/downloads/credentials?file_name=kubeconfig"
+    dest: "{{ workdir }}/kubeconfig"
+    headers:
+      Authorization: "{{ api_token }}"
+
+- name: Download kubeadmin password
+  get_url:
+    url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}/downloads/credentials?file_name=kubeadmin-password"
+    dest: "{{ workdir }}/kubeadmin-password"
+    headers:
+      Authorization: "{{ api_token }}"
+
+- name: Download OpenShift bare metal cluster install-config.yaml.
+  get_url:
+    url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}/downloads/files?file_name=install-config.yaml"
+    dest: "{{ workdir }}/install-config.yaml"
+    headers:
+      Authorization: "{{ api_token }}"
