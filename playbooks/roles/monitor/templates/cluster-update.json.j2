@@ -18,7 +18,7 @@
     ],
     {% endif %}
     {% else %}
-    "network_type": "OpenShiftSDN",
+    "network_type": "{{ cni_network_provider }}",
     "user_managed_networking": true,
     {% endif %}
     "service_networks": [
