@@ -13,8 +13,6 @@ controlPlane:
 metadata:
   name: {{ dns.clusterid }}
 networking:
-  machineNetwork:
-  - cidr: {{ dhcp.subnet }}
   clusterNetwork:
   - cidr: 10.128.0.0/14
     hostPrefix: 23

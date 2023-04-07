@@ -1,12 +1,14 @@
-  - name: Get access Token
-    include_tasks: assisted-refresh-token.yaml
+- name: Get access Token
+  include_tasks: assisted-refresh-token.yaml
 
+################# Create new cluster and infraenv from Assisted Service ################
+- name: Create Cluster and infraenv
+  when: not assisted_exist_cluster|bool
+  block:
   - name: Generate cluster-create.json
     template:
       src: ../templates/assisted-create.json.j2
       dest: "{{ workdir }}/assisted-create.json"
-
-
   - name: Call to assisted service to create cluster
     uri:
       url: "{{ assisted_url }}/clusters"
@@ -24,13 +26,13 @@
       dest: "{{ workdir }}/assisted-create-output.json"
 
   - set_fact:
-      assisted_cluster_id: "{{ cluster_result.json.id }}" 
+      new_cluster_id: "{{ cluster_result.json.id }}" 
 
   - name: Generate assisted-register.json
     template:
       src: ../templates/assisted-register.json.j2
       dest: "{{ workdir }}/assisted-register.json"
- 
+
   - name: Register the cluster infra-env to assisted service
     uri:
       url: "{{ assisted_url }}/infra-envs"
@@ -47,56 +49,167 @@
       content:  "{{ register_result.json }}"
       dest: "{{ workdir }}/assisted-register-output.json"
 
-  - name: Patch discovery ignition
-    when: ("api.integration" in assisted_url)
-    block:
-      - name: Copy registries.conf
-        template: 
-          src:  ../templates/registries.conf.j2
-          dest: "{{ workdir }}/registries.conf"
-      
-      - name: Generate agent-config.yaml
-        template:
-          src: ../templates/discovery-ignition.json.j2
-          dest: "{{ workdir }}/discovery-ignition.json"
+  - set_fact:
+      new_infraenv_id: "{{ register_result.json.id }}" 
 
-      - name: Create the patch config
-        shell: |
-          base64 -w0 registries.conf > registries.conf.b64
-          sed -i "s/BASE64_ENCODED_REGISTRY_CONF/$(cat registries.conf.b64)/" discovery-ignition.json
-        args:
-          chdir: "{{ workdir }}"
-
-      - name: Patch the discovery ignition
-        uri:
-          url: "{{ assisted_url }}/infra-envs/{{ register_result.json.id }}"
-          method: PATCH
-          body_format: json
-          src: "{{ workdir }}/discovery-ignition.json"
-          headers:
-              Authorization: "{{ api_token }}"
-          status_code: 201
-
-  - name: Get Infraenv info after patch
+################# Get exist cluster and infraenv from Assisted Service ################
+- name: Get exist cluster and infraenv info
+  when: assisted_exist_cluster|bool
+  block:
+  - name: Get all exist clusters
     uri:
-      url: "{{ assisted_url }}/infra-envs/{{ register_result.json.id }}"
+      url: "{{ assisted_url }}/clusters"
       method: GET
       body_format: json
       return_content: yes
       headers:
         Authorization: "{{ api_token }}"
       status_code: 200
-    register: infraenv_result2
-
-  - name: Save register cluster output to file
+    register: clusters_result
+  - name: Set the cluster to specified
+    set_fact:
+      cluster: "{{ clusters_result.json | community.general.json_query(cluster_name_query) }}"
+    vars:
+      cluster_name_query: "[?contains(name,'{{ dns.clusterid }}')]"
+  - name: print the cluster
+    debug:
+      msg: "{{ cluster|length }}: {{ cluster[0].id }}"
+  
+  - name: Save exist cluster output to file
     copy: 
-      content:  "{{ infraenv_result2.json }}"
-      dest: "{{ workdir }}/assisted-patched-output.json"
+      content:  "{{ cluster[0] }}"
+      dest: "{{ workdir }}/assisted-cluster-output.json"
 
-  - name: Download the discovery ISO
-    get_url:
-      url: "{{ infraenv_result2.json.download_url }}"
-      dest: "{{ workdir }}/{{install_type}}.iso"
+  - set_fact:
+      exist_cluster_id: "{{ cluster[0].id }}"     
+
+  - name: Call all exist infraenv info
+    uri:
+      url: "{{ assisted_url }}/infra-envs"
+      method: GET
+      body_format: json
+      return_content: yes
       headers:
         Authorization: "{{ api_token }}"
-      force: yes
+      status_code: 200
+    register: inforaenvs_result
+
+  - name: Get specified Infraenv
+    set_fact:
+      infraenv: "{{ inforaenvs_result.json | community.general.json_query(cluster_id_query) }}"
+    vars:
+      cluster_id_query: "[?contains(cluster_id,'{{ cluster[0].id }}')]"
+
+  - name: print the infraenv
+    debug:
+      msg: "{{ infraenv|length }}: {{ infraenv[0].id }}"
+
+  - name: Save exist infraenv output to file
+    copy: 
+      content:  "{{ infraenv[0] }}"
+      dest: "{{ workdir }}/assisted-infraenv-output.json"
+
+  - set_fact:
+      exist_infraenv_id: "{{ infraenv[0].id }}"     
+
+##############################################################################
+- name: Set assisted_cluster_id 
+  block:
+    - assert:
+        that: assisted_exist_cluster|bool
+    - set_fact:
+        assisted_cluster_id: "{{ exist_cluster_id }}"
+  rescue:
+    - set_fact:
+        assisted_cluster_id: "{{ new_cluster_id }}"
+
+- name: Set assisted_infraenv_id 
+  block:
+    - assert:
+        that: assisted_exist_cluster|bool
+    - set_fact:
+        assisted_infraenv_id: "{{ exist_infraenv_id }}"
+  rescue:
+    - set_fact:
+        assisted_infraenv_id: "{{ new_infraenv_id }}"
+
+- name: print the cluster_id and infraenv_id
+  debug:
+    msg: "cluster_id: {{ assisted_cluster_id }} infraenv_id: {{ assisted_infraenv_id }}"
+
+################## patch cluster if agent images behind VPN ##################
+- name: Patch discovery ignition
+  when: ("api.integration" in assisted_url) or ("api.stage" in assisted_url)
+  block:
+    - name: Copy registries.conf
+      template: 
+        src:  ../templates/registries.conf.j2
+        dest: "{{ workdir }}/registries.conf"
+    
+    - name: Generate discovery-ignition.json
+      template:
+        src: ../templates/discovery-ignition.json.j2
+        dest: "{{ workdir }}/discovery-ignition.json"
+
+    - name: Copy machineconfig-master.yaml
+      template: 
+        src:  ../templates/machineconfig-master.yaml.j2
+        dest: "{{ workdir }}/machineconfig-master.yaml"
+    
+    - name: Generate assisted-customization.json
+      template:
+        src: ../templates/assisted-customization.json.j2
+        dest: "{{ workdir }}/assisted-customization.json"
+
+    - name: Create the patch config
+      shell: |
+        base64 -w0 registries.conf > registries.conf.b64
+        sed -i "s/BASE64_ENCODED_REGISTRY_CONF/$(cat registries.conf.b64)/" discovery-ignition.json
+        base64 -w0 machineconfig-master.yaml > machineconfig-master.yaml.b64
+        sed -i "s/BASE64_ENCODED_MACHINECONFIG_YAML/$(cat machineconfig-master.yaml.b64)/" assisted-customization.json
+      args:
+        chdir: "{{ workdir }}"
+
+    - name: Patch infraenv for discovery ignition
+      uri:
+        url: "{{ assisted_url }}/infra-envs/{{ assisted_infraenv_id }}"
+        method: PATCH
+        body_format: json
+        src: "{{ workdir }}/discovery-ignition.json"
+        headers:
+            Authorization: "{{ api_token }}"
+        status_code: 201
+
+    # - name: Patch cluster for master customization
+    #   uri:
+    #     url: "{{ assisted_url }}/clusters/{{ assisted_cluster_id }}/manifests"
+    #     method: POST
+    #     body_format: json
+    #     src: "{{ workdir }}/assisted-customization.json"
+    #     headers:
+    #         Authorization: "{{ api_token }}"
+    #     status_code: 201
+
+- name: Get Infraenv info after patch
+  uri:
+    url: "{{ assisted_url }}/infra-envs/{{ assisted_infraenv_id }}"
+    method: GET
+    body_format: json
+    return_content: yes
+    headers:
+      Authorization: "{{ api_token }}"
+    status_code: 200
+  register: infraenv_result2
+
+- name: Save register cluster output to file
+  copy: 
+    content:  "{{ infraenv_result2.json }}"
+    dest: "{{ workdir }}/assisted-patched-output.json"
+
+- name: Download the discovery ISO
+  get_url:
+    url: "{{ infraenv_result2.json.download_url }}"
+    dest: "{{ workdir }}/{{install_type}}.iso"
+    headers:
+      Authorization: "{{ api_token }}"
+    force: yes
