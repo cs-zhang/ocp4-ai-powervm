@@ -1,6 +1,6 @@
 - name: Wait for at least one Day2 worker to be discovered in Assisted Installer
   uri:
-    url: "{{ assisted_url }}/clusters/{{ day2clusterdetails.json.id }}"
+    url: "{{ assisted_url }}/clusters/{{ day2clusterdetails.id }}"
     method: GET
     headers:
       accept: application/json
@@ -15,7 +15,7 @@
 
 - name: Retrieve Day2 OpenShift hosts list
   uri:
-    url: "{{ assisted_url }}/infra-envs/{{ day2infraenvdetails.json.id }}/hosts"
+    url: "{{ assisted_url }}/infra-envs/{{ day2infraenvdetails.id }}/hosts"
     method: GET
     headers:
       accept: application/json
@@ -27,7 +27,7 @@
 
 - name: Wait till Day2 OpenShift hosts are in known status
   uri:
-    url: "{{ assisted_url }}/infra-envs/{{ day2infraenvdetails.json.id }}/hosts/{{ item }}"
+    url: "{{ assisted_url }}/infra-envs/{{ day2infraenvdetails.id }}/hosts/{{ item }}"
     method: GET
     headers:
       accept: application/json
@@ -43,7 +43,7 @@
 
 - name: Install Day2 OpenShift hosts
   uri:
-    url: "{{ assisted_url }}/infra-envs/{{ day2infraenvdetails.json.id }}/hosts/{{ item }}/actions/install"
+    url: "{{ assisted_url }}/infra-envs/{{ day2infraenvdetails.id }}/hosts/{{ item }}/actions/install"
     method: POST
     headers:
       accept: application/json
@@ -55,7 +55,7 @@
 
 - name: Wait till Day2 OpenShift bare metal hosts are added-to-existing-cluster
   uri:
-    url: "{{ assisted_url }}/infra-envs/{{ day2infraenvdetails.json.id }}/hosts/{{ item }}"
+    url: "{{ assisted_url }}/infra-envs/{{ day2infraenvdetails.id }}/hosts/{{ item }}"
     method: GET
     headers:
       accept: application/json

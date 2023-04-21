@@ -3,15 +3,16 @@
 - name: Get access Token
   include_tasks: ../../ignition/tasks/assisted-refresh-token.yaml
 
+# - name: Create the day2 cluster/infraenv
+#   include_tasks: assisted-iso.yaml
+
 - name: Create the day2 cluster/infraenv
   include_tasks: assisted-create.yaml
 
 - name: Boot Workers with Day2 ISO image
   include_tasks: netboot.yaml
 
-- name: Add the day2 hosts to cluster
-  include_tasks: assisted-add.yaml
+- name: Monitor add day2 hosts to cluster
+  include_tasks: assisted-monitor.yaml
 
-- name: Approve CSRs for added hosts
-  include_tasks: assisted-csr.yaml
   

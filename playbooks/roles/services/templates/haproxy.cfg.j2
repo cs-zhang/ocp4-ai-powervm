@@ -94,6 +94,20 @@ backend machine-config-server
     server {{ bootstrap.name | lower }} {{ bootstrap.ipaddr }}:6443 check
 {% endif %}
 
+frontend machine-config-server-day2
+    bind *:22624
+    default_backend machine-config-server-day2
+    option tcplog
+
+backend machine-config-server-day2
+    balance source
+{% for m in masters %}
+    server {{ m.name | lower }} {{ m.ipaddr }}:22624 check
+{% endfor %}
+{% if bootstrap is defined %}
+    server {{ bootstrap.name | lower }} {{ bootstrap.ipaddr }}:6444 check
+{% endif %}
+
 frontend ingress-http
     bind *:80
     default_backend ingress-http

@@ -1,6 +1,12 @@
 ---
 # file: main.yml
 
+- hosts: localhost
+  vars_files:
+    - defaults/main.yaml
+  handlers:
+  - import_tasks: handlers/main.yml
+  
 - name: Setup services for bastion
   hosts: localhost
   become: true

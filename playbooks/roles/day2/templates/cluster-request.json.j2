@@ -1,6 +1,5 @@
 {
- "name": "scale-up-{{ dns.clusterid }}",
- "openshift_cluster_id": "{{ day1_cluster_info.id }}",
- "openshift_version": "{{assisted_ocp_version }}",
+ "name": "{{ dns.clusterid }}",
+ "openshift_cluster_id": "{{ day1_ocp_cluster_id }}",
  "api_vip_dnsname": "api.{{ dns.clusterid + '.' + dns.domain  }}"
 }

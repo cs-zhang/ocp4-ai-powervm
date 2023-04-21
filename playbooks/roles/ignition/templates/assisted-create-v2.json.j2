@@ -14,7 +14,6 @@
 
     "vip_dhcp_allocation": false,
     {% if dhcp.api_vip is defined %}
-    "network_type": "{{ cni_network_provider }}",
     "user_managed_networking": false,
     "api_vip": "{{ dhcp.api_vip }}",
     "api_vips": [{ "ip": "{{ dhcp.api_vip }}" }],
@@ -23,17 +22,32 @@
     "ingress_vips": [{ "ip": "{{ dhcp.ingress_vip }}" } ],
     {% endif %}
     {% else %}
-    "network_type": "OpenShiftSDN",
     "user_managed_networking": true,
+    "ingress_vip": "",
     {% endif %}
-    "service_networks": [
-      {"cidr": "172.30.0.0/16"}
-    ],
+    {% if assisted_net_dualstack|bool %}
     "cluster_networks": [
-      {
-        "cidr": "10.128.0.0/14",
-        "host_prefix": 23
-      }
-    ]
+    {
+      "cidr": "10.128.0.0/14",
+      "host_prefix": 23
+    },
+    {
+      "cidr": "fd01::/48",
+      "host_prefix": 64
+    }
+    ],
+    "service_networks": [
+    {
+      "cidr": "172.30.0.0/16"
+    },
+    {
+      "cidr": "fd02::/112"
+    }
+    ],
+    {% else %}
+    "cluster_network_cidr": "10.128.0.0/14",
+    "cluster_network_host_prefix": 23,
+    "service_network_cidr": "172.30.0.0/16"
+    {% endif %}
 }
 
