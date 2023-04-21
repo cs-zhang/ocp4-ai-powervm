@@ -5,7 +5,7 @@
     oc get csr | awk '/node-bootstrapper.*Pending/ { print $1 }'
   register: csrName
   until: (csrName.stdout_lines | length) != 0
-  retries: 30
+  retries: 50
   delay: 30
 
 - name: Approve bootstrap CSR
@@ -22,7 +22,7 @@
      oc get csr | awk  '/worker.*Pending/ { print $1 }'
   register: nodeCsrName
   until:  nodeCsrName.stdout|length == day2_workers|length
-  delay: 30
+  delay: 50
   retries: 30
 
 - name: Approve node CSR

@@ -138,6 +138,22 @@
     msg: "cluster_id: {{ assisted_cluster_id }} infraenv_id: {{ assisted_infraenv_id }}"
 
 ################## patch cluster if agent images behind VPN ##################
+- name: Patch OpenShift bare metal cluster to enable ODF
+  when: assisted_deploy_odf_operator|bool
+  uri:
+    url: "{{ assisted_url }}/clusters/{{ assisted_cluster_id }}"
+    method: PATCH
+    headers:
+      Content-Type: application/json
+      accept: application/json
+      Authorization: "{{ api_token }}"
+    body:
+      olm_operators:
+      - name: "ocs"
+    body_format: json
+    return_content: yes
+    status_code: 201
+
 - name: Patch discovery ignition
   when: ("api.integration" in assisted_url) or ("api.stage" in assisted_url)
   block:
@@ -186,6 +202,21 @@
     #     method: POST
     #     body_format: json
     #     src: "{{ workdir }}/assisted-customization.json"
+    #     headers:
+    #         Authorization: "{{ api_token }}"
+    #     status_code: 201
+
+    # - name: Generate install-config mirror patch.json
+    #   template:
+    #     src: ../templates/assisted-mirror.json.j2
+    #     dest: "{{ workdir }}/assisted-mirror.json"
+
+    # - name: Patch install-config with mirror registries
+    #   uri:
+    #     url: "{{ assisted_url }}/clusters/{{ assisted_cluster_id }}/install-config"
+    #     method: PATCH
+    #     body_format: json
+    #     src: "{{ workdir }}/assisted-mirror.json"
     #     headers:
     #         Authorization: "{{ api_token }}"
     #     status_code: 201

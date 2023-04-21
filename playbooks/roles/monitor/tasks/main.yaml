@@ -14,6 +14,10 @@
   when: install_type == "sno" or install_type == "normal"
   include: sno.yaml
 
+- name: Wait ODF Ready
+  when: assisted_deploy_odf_operator|bool
+  include: wait-odf.yaml
+  
 - name: Post install process
   when: storage_type is defined and storage_type == "nfs"
   include: post-nfs.yaml

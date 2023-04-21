@@ -9,6 +9,7 @@
     "high_availability_mode": "Full",
     {% endif %}
     "network_type": "{{ cni_network_provider }}",
+    "user_managed_networking": true,
     "ssh_public_key": "{{ public_ssh_key }}",
     "pull_secret": {{ pull_secret | to_json }}
 }

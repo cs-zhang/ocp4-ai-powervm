@@ -22,5 +22,7 @@
   become: false
   gather_facts: false
   any_errors_fatal: true
+  vars:
+    kubeconfig_file: "{{ workdir}}/kubeconfig"
   roles:
   - day2
