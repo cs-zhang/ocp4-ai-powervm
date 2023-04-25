@@ -6,3 +6,5 @@ node_connection_timeout: 2700
 openshift_installer: "openshift-install"
 assisted_token: ""
 kubeconfig_file: "{{ workdir}}/kubeconfig"
+# deploy OpenShift Data Foundation
+assisted_deploy_odf_operator: false

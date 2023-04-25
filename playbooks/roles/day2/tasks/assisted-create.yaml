@@ -3,6 +3,8 @@
 #     day1_cluster_info: '{{ lookup("file", "{{ workdir }}/assisted-create-output.json") | from_json }}'
 
 - name: Get day1 OCP cluster ID 
+  environment:
+    KUBECONFIG: "{{ kubeconfig_file }}"
   shell: oc get clusterversion -o jsonpath='{.items[].spec.clusterID}'
   register: day1_ocp_cluster_id_result
 
