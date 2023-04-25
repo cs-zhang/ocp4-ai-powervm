@@ -4,9 +4,8 @@
 rhcos_arch: ppc64le
 ocp_client_arch: ppc64le
 cni_network_provider: OVNKubernetes
-kubeconfig_file: "{{ workdir}}/kubeconfig"
+kubeconfig_file: "{{ workdir }}/kubeconfig"
 assisted_token: ""
-workdir: ~/workdir-ocp4-ai
 ####################################
 pull_secret: "{{ lookup('file', '~/.openshift/pull-secret') | from_json | to_json }}"
 public_ssh_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"

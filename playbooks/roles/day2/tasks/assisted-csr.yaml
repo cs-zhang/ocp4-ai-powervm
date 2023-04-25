@@ -21,7 +21,7 @@
   shell: |
      oc get csr | awk  '/worker.*Pending/ { print $1 }'
   register: nodeCsrName
-  until:  nodeCsrName.stdout|length == day2_workers|length
+  until:  nodeCsrName.stdout_lines|length == day2_workers|length
   delay: 50
   retries: 30
 
