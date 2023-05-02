@@ -10,6 +10,9 @@ cni_network_provider: OVNKubernetes
 storage_type: ""
 node_connection_timeout: 2700
 openshift_installer: "openshift-install"
+# disk encryption
+disk_encryption: false
+#####################################
 assisted_token: ""
 assisted_exist_cluster: false
 # deploy with dual IP stack

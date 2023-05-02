@@ -9,7 +9,7 @@
       status_code: 200
   register: status_2
   until: status_2.json.status == "ready" or status_2.json.status == "installing" or status_2.json.status == "installed"
-  retries: 30
+  retries: 60
   delay: 30
 
 - name: Start installation
@@ -23,7 +23,7 @@
     status_code: 202
   register: install_status
   until: install_status.status == 202
-  delay: 20
+  delay: 30
   retries: 15
 
 - name: Waiting for installation start
@@ -60,3 +60,32 @@
     dest: "{{ workdir }}/install-config.yaml"
     headers:
       Authorization: "{{ api_token }}"
+
+- name: Get cluster manifests
+  uri:
+    url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}/manifests"
+    method: GET
+    body_format: json
+    return_content: yes
+    headers:
+      Authorization: "{{ api_token }}"
+    status_code: 200
+  register: manifests
+
+# - name: Show cluster manifests
+#   debug:
+#     msg: "{{ manifests.json }}" 
+
+- name: save all manifest list to file
+  copy:
+    content: "{{ manifests.json }}"
+    dest: "{{ workdir }}/cluster-manifest-list.txt"
+
+- name: Download all manifest files
+  get_url:
+    url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}/manifests/files?folder={{ item.folder }}&file_name={{ item.file_name }}"
+    dest: "{{ workdir }}/{{ item.folder }}-{{ item.file_name }}"
+    headers:
+      Authorization: "{{ api_token }}"
+  loop: "{{ manifests.json }}"
+  
