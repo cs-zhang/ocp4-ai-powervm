@@ -8,13 +8,13 @@
   - name: Generate cluster-create.json
     template:
       src: ../templates/assisted-create.json.j2
-      dest: "{{ workdir }}/assisted-create.json"
+      dest: "{{ workdir }}/assisted-cluster-create.json"
   - name: Call to assisted service to create cluster
     uri:
       url: "{{ assisted_url }}/clusters"
       method: POST
       body_format: json
-      src: "{{ workdir }}/assisted-create.json"
+      src: "{{ workdir }}/assisted-cluster-create.json"
       headers:
           Authorization: "{{ api_token }}"
       status_code: 201
@@ -23,22 +23,22 @@
   - name: Save create cluster output to file
     copy: 
       content:  "{{ cluster_result.json }}"
-      dest: "{{ workdir }}/assisted-create-output.json"
+      dest: "{{ workdir }}/assisted-cluster-create-output.json"
 
   - set_fact:
       new_cluster_id: "{{ cluster_result.json.id }}" 
 
-  - name: Generate assisted-register.json
+  - name: Generate assisted-infraenv register.json
     template:
       src: ../templates/assisted-register.json.j2
-      dest: "{{ workdir }}/assisted-register.json"
+      dest: "{{ workdir }}/assisted-infraenv-register.json"
 
-  - name: Register the cluster infra-env to assisted service
+  - name: Register the infra-env to assisted service
     uri:
       url: "{{ assisted_url }}/infra-envs"
       method: POST
       body_format: json
-      src: "{{ workdir }}/assisted-register.json"
+      src: "{{ workdir }}/assisted-infraenv-register.json"
       headers:
           Authorization: "{{ api_token }}"
       status_code: 201
@@ -47,7 +47,7 @@
   - name: Save register cluster output to file
     copy: 
       content:  "{{ register_result.json }}"
-      dest: "{{ workdir }}/assisted-register-output.json"
+      dest: "{{ workdir }}/assisted-infraenv-register-output.json"
 
   - set_fact:
       new_infraenv_id: "{{ register_result.json.id }}" 
@@ -151,11 +151,6 @@
       Authorization: "{{ api_token }}"
     status_code: 200
   register: infraenv_result2
-
-- name: Save register cluster output to file
-  copy: 
-    content:  "{{ infraenv_result2.json }}"
-    dest: "{{ workdir }}/assisted-patched-output.json"
 
 - name: Download the discovery ISO
   get_url:

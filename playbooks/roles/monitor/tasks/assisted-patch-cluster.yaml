@@ -89,7 +89,7 @@
           Authorization: "{{ api_token }}"
         status_code: 201
       vars:
-        query: "[?requested_hostname==`{{ item.name }}`].id"
+        query: "[?requested_hostname=='{{ item.name }}' || requested_hostname=='{{ item.name }}.{{ dns.clusterid }}.{{ dns.domain }}'].id"
       with_items: "{{ masters }}"
 
     - name: set role for workers
@@ -102,7 +102,7 @@
         body: '{ "host_role": "worker" }'
         status_code: 201
       vars:
-        query: "[?requested_hostname==`{{ item.name }}`].id"
+        query: "[?requested_hostname=='{{ item.name }}' || requested_hostname=='{{ item.name }}.{{ dns.clusterid }}.{{ dns.domain }}'].id"
       with_items: "{{ workers }}"
       when: 
         - workers is defined 

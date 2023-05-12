@@ -46,7 +46,7 @@ platform:
 {% endif %}
 {% if install_type == "sno" %}
 bootstrapInPlace:
-  installationDisk: {{ masters[0].disk }}
+  installationDisk: {{ masters[0].disk | default( disk ) }}
 {% endif %}
 sshKey: '{{ public_ssh_key }}'
 {% if setup_registry.deploy %}

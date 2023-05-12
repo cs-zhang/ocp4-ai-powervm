@@ -125,11 +125,6 @@ backend ingress-http
     server {{ m.name | lower }}-http-router{{ loop.index0 }} {{ m.ipaddr }}:80 check
 {% endfor %}
 {% endif %}
-{% if workers is defined and workers | length < 2 %}
-{% for w in workers %}
-    server {{ w.name | lower }}-http-router{{ loop.index0 }} {{ w.ipaddr }}:80 check
-{% endfor %}
-{% endif %}
 {% if day2_workers is defined and day2_workers | length > 0 %}
 {% for w in day2_workers %}
     server {{ w.name | lower }}-http-router{{ loop.index0 }} {{ w.ipaddr }}:80 check
@@ -151,11 +146,6 @@ backend ingress-https
 {% if workers is not defined or workers | length < 2 %}
 {% for m in masters %}
     server {{ m.name | lower }}-https-router{{ loop.index0 }} {{ m.ipaddr }}:443 check
-{% endfor %}
-{% endif %}
-{% if workers is defined and workers | length < 2 %}
-{% for w in workers %}
-    server {{ w.name | lower }}-https-router{{ loop.index0 }} {{ w.ipaddr }}:443 check
 {% endfor %}
 {% endif %}
 {% if day2_workers is defined and day2_workers | length > 0 %}

@@ -1,4 +1,14 @@
 ---
+- name: Set dynamic IP 
+  block:
+  #   - assert:
+  #       that: static_ip|bool
+  #   - set_fact:
+  #       ip_config: "ip={{ ipaddr }}::{{ dhcp.router }}:{{ dhcp.netmask }}::eth0:none nameserver={{ helper.ipaddr }}"
+  # rescue:
+    - set_fact:
+        ip_config: "ip=dhcp"
+
 - name: create grub2 block for Assisted/Agent/SNO
   when: install_type != "normal"
   blockinfile:
