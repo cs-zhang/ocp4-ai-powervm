@@ -19,7 +19,21 @@ hosts:
             address:
               - ip: {{ m.ipaddr }}
                 prefix-length: 24
+{% if static_ip|bool %}
+            dhcp: false
+      dns-resolver:
+        config:
+          server:
+            - {{ helper.idaddr }}
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: {{ dhcp.route }}
+            next-hop-interface: eth0
+            table-id: 254
+{% else %}
             dhcp: true
+{% endif %}
 {% endfor %}
 {% if workers is defined and workers | length > 0 %}
 {% for w in workers %}
@@ -38,6 +52,20 @@ hosts:
             address:
               - ip: {{ w.ipaddr }}
                 prefix-length: 24
+{% if static_ip|bool %}
+            dhcp: false
+      dns-resolver:
+        config:
+          server:
+            - {{ helper.idaddr }}
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: {{ dhcp.route }}
+            next-hop-interface: eth0
+            table-id: 254
+{% else %}
             dhcp: true
+{% endif %}
 {% endfor %}
 {% endif %}

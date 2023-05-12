@@ -63,16 +63,6 @@
         ignition_url: "http://{{ helper.ipaddr }}:{{ http_port }}/ignition"
         coreos_inst_url: "coreos.live.rootfs_url=http://{{ helper.ipaddr }}:{{ http_port }}/install/rootfs.img"    
 
-    - name: Set dynamic IP 
-      block:
-        - assert:
-            that: static_ip is defined and static_ip|bool
-        - set_fact:
-            ip_setting: "::{{ dhcp.route }}:{{ dhcp.netmask }}:"
-      rescue:
-        - set_fact:
-            ip_setting: "dhcp"
-
     - name: create grub.cfg
       copy:
         dest: /var/lib/tftpboot/boot/grub2/grub.cfg
@@ -86,9 +76,9 @@
         ignition: "{{ install_type }}.ign"
         name: "{{ bootstrap.name }}"
         mac: "{{ bootstrap.macaddr }}"
+        ipaddr: "{{ bootstrap.ipaddr }}"
         mdisk: "{{ bootstrap.disk | default( disk ) }}"
         multipath: ""
-        ip_config: "ip={{ ip_setting }}"
       include_tasks: generate_grub.yaml
       when: bootstrap is defined
     - name: generate grub entry (masters)
@@ -97,9 +87,9 @@
         ignition: "{{ install_type }}.ign"
         name: "{{ item.name }}"
         mac: "{{ item.macaddr }}"
+        ipaddr: "{{ item.ipaddr }}"
         mdisk: "{{ item.disk | default( disk ) }}"
         multipath: "{{ item.multipath | default('') }}"
-        ip_config: "ip={{ ip_setting }}"
       include_tasks: generate_grub.yaml
       with_items: "{{ masters }}"
     - name: generate grub entry (workers)
@@ -108,9 +98,9 @@
         ignition: "{{ install_type }}.ign"
         name: "{{ item.name }}"
         mac: "{{ item.macaddr }}"
+        ipaddr: "{{ item.ipaddr }}"
         mdisk: "{{ item.disk | default( disk ) }}"
         multipath: "{{ item.multipath | default('') }}"
-        ip_config: "ip={{ ip_setting }}"
       include_tasks: generate_grub.yaml
       with_items: "{{ workers }}"
       when:
@@ -122,9 +112,9 @@
         ignition: "{{ install_type }}-day2.ign"
         name: "{{ item.name }}"
         mac: "{{ item.macaddr }}"
+        ipaddr: "{{ item.ipaddr }}"
         mdisk: "{{ item.disk | default( disk ) }}"
         multipath: "{{ item.multipath | default('') }}"
-        ip_config: "ip={{ ip_setting }}"
       include_tasks: generate_grub.yaml
       with_items: "{{ day2_workers }}"
       when:

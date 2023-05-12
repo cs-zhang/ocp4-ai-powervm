@@ -4,7 +4,7 @@
 
 - name: Get cluster info from output json file
   set_fact:
-    cluster_info: '{{ lookup("file", "{{ workdir }}/assisted-create-output.json") | from_json }}'
+    cluster_info: '{{ lookup("file", "{{ workdir }}/assisted-cluster-create-output.json") | from_json }}'
 
 - name: Show cluster ID
   debug:
@@ -12,7 +12,7 @@
 
 - name: Get cluster infraenv info from output json file
   set_fact:
-    infraenv_info: '{{ lookup("file", "{{ workdir }}/assisted-register-output.json") | from_json }}'
+    infraenv_info: '{{ lookup("file", "{{ workdir }}/assisted-infraenv-register-output.json") | from_json }}'
 
 - name: Show cluster infraenv ID
   debug:
