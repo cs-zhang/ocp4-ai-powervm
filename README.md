@@ -305,7 +305,7 @@ Access to Assisted Installer [WEB UI](https://console.redhat.com/openshift/assis
 &nbsp;
 ![Add Hosts - 1](./images/Screen-3-host-discovery-add-host-1.png)
 &nbsp;
-1. At `Add Hosts` popup dialog, save the URL for download `Discovery ISO` for late use
+6. At `Add Hosts` popup dialog, save the URL for download `Discovery ISO` for late use
 &nbsp;
 ![Add Hosts - 2](./images/Screen-3-host-discovery-add-hosts-2.png)
 &nbsp;

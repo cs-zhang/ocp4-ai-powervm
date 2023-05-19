@@ -41,7 +41,13 @@
     args:
       chdir: "{{ workdir }}"
 
+  - name: embed the ignition file to rhcos-live.iso
+    when: rhcos_iso is defined and install_type == "download"
+    shell: "coreos-installer iso ignition embed /usr/local/src/rhcos-live-{{ rhcos_arch }}.iso -o rhcos-sno-ign.iso -fi sno.ign"
+    args:
+      chdir: "{{ workdir }}"
+
   # - name: Add ignition kernel args to rhcos-live.iso
-  #   shell: "coreos-installer iso kargs modify /usr/local/src/rhcos-live-{{ rhcos_arch }}.iso -o rhcos-live-http-ign.iso -a ignition.config.url=http://{{ helper.ipaddr }}:8080/ignition/{{ install_type }}.ign"
+  #   shell: "coreos-installer iso kargs modify /usr/local/src/rhcos-live-{{ rhcos_arch }}.iso -o rhcos-sno-http-ign.iso -a ignition.config.url=http://{{ helper.ipaddr }}:8080/ignition/{{ install_type }}.ign"
   #   args:
   #     chdir: "{{ workdir }}"
