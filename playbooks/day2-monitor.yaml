@@ -9,7 +9,7 @@
 
 - hosts: all    
   vars:
-    kubeconfig_file: "{{ workdir}}/kubeconfig"
+    kubeconfig_file: "{{ workdir}}/auth/kubeconfig"
   tasks:
   - name: Monitor add day2 workers
     include_tasks: roles/day2/tasks/assisted-monitor.yaml
