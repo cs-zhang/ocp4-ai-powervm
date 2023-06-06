@@ -23,6 +23,6 @@
   gather_facts: false
   any_errors_fatal: true
   vars:
-    kubeconfig_file: "{{ workdir}}/kubeconfig"
+    kubeconfig_file: "{{ workdir}}/auth/kubeconfig"
   roles:
   - day2
