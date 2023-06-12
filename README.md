@@ -119,7 +119,7 @@ fallback=1
 timeout=1
 menuentry "CoreOS (BIOS)" {
    echo "Loading kernel"
-   linux "/rhcos/kernel" ip=dhcp rd.neednet=1 ignition.platform.id=metal ignition.firstboot coreos.live.rootfs_url=http://9.114.98.8:8000/install/rootfs.img ignition.config.url=http://9.114.98.8:8000/ign
+   linux "/rhcos/kernel" ip=dhcp rd.neednet=1 ignition.platform.id=metal ignition.firstboot coreos.live.rootfs_url=http://9.114.98.8:8000/install/rootfs.img ignition.config.url=http://9.114.98.8:8000/ignition/assisted.ign
 
    echo "Loading initrd"
    initrd  "/rhcos/initramfs.img"
@@ -132,7 +132,7 @@ fallback=1
 timeout=1
 menuentry "CoreOS (BIOS)" {
    echo "Loading kernel"
-   linux "/rhcos/kernel" ip=dhcp rd.neednet=1 ignition.platform.id=metal ignition.firstboot coreos.live.rootfs_url=http://9.114.98.8:8000/install/rootfs.img ignition.config.url=http://9.114.98.8:8000/ign
+   linux "/rhcos/kernel" ip=dhcp rd.neednet=1 ignition.platform.id=metal ignition.firstboot coreos.live.rootfs_url=http://9.114.98.8:8000/install/rootfs.img ignition.config.url=http://9.114.98.8:8000/ignition/assisted.ign
 
    echo "Loading initrd"
    initrd  "/rhcos/initramfs.img"
@@ -145,7 +145,7 @@ fallback=1
 timeout=1
 menuentry "CoreOS (BIOS)" {
    echo "Loading kernel"
-   linux "/rhcos/kernel" ip=dhcp rd.neednet=1 ignition.platform.id=metal ignition.firstboot coreos.live.rootfs_url=http://9.114.98.8:8000/install/rootfs.img ignition.config.url=http://9.114.98.8:8000/ign
+   linux "/rhcos/kernel" ip=dhcp rd.neednet=1 ignition.platform.id=metal ignition.firstboot coreos.live.rootfs_url=http://9.114.98.8:8000/install/rootfs.img ignition.config.url=http://9.114.98.8:8000/ignition/assisted.ign
 
    echo "Loading initrd"
    initrd  "/rhcos/initramfs.img"

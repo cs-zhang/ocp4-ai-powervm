@@ -19,6 +19,8 @@
   when: install_type != "assisted"
   include: agent.yaml
 
-# - name: Day2 for SNO install
-#   when: install_type == "sno" or install_type == "normal"
-#   include: sno.yaml
+- name: Day2 for SNO install
+  when: install_type == "sno" or install_type == "normal"
+  environment:
+    KUBECONFIG: "{{ kubeconfig_file }}"
+  include: sno.yaml
