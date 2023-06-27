@@ -7,6 +7,8 @@
 #   include_tasks: assisted-iso.yaml
 
 - name: Create the day2 cluster/infraenv
+  environment:
+    KUBECONFIG: "{{ kubeconfig_file }}"
   include_tasks: assisted-create.yaml
 
 - name: Boot Workers with Day2 ISO image

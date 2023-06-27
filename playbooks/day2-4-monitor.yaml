@@ -1,13 +1,10 @@
 ---
 # Monitor day2 worker nodes
 
-- hosts: all
-  vars_files:
-    - defaults/main.yaml
-  handlers:
-  - import_tasks: handlers/main.yml
 
 - hosts: all    
+  vars_files:
+    - defaults/main.yaml
   vars:
     kubeconfig_file: "{{ workdir}}/auth/kubeconfig"
   tasks:

@@ -5,6 +5,7 @@ rendezvousIP: {{ masters[0].ipaddr }}
 hosts:
 {% for m in masters %}
   - hostname: {{ m.name }}
+    role: master
     interfaces:
        - name: eth0
          macAddress: {{ m.macaddr }}
@@ -38,6 +39,7 @@ hosts:
 {% if workers is defined and workers | length > 0 %}
 {% for w in workers %}
   - hostname: {{ w.name }}
+    role: worker
     interfaces:
        - name: eth0
          macAddress: {{ w.macaddr }}

@@ -19,8 +19,10 @@ networking:
   networkType: {{ cni_network_provider }}
   serviceNetwork:
   - 172.30.0.0/16
+  machineNetwork:
+  - cidr: {{ dhcp.subnet }}
 platform:
-{% if (masters | length == 1 and install_type != "normal") or install_type == "normal" %}
+{% if dhcp.api_vip is not defined %}
   none: {}
 {% else %}
   baremetal:
@@ -38,9 +40,11 @@ platform:
 {% endfor %}
 {% endif %}
 {% if dhcp.api_vip is defined %}
-    apiVIP: {{ dhcp.api_vip }}
+    apiVIPs: 
+      - {{ dhcp.api_vip }}
 {% if dhcp.ingress_vip is defined %}
-    ingressVIP: {{ dhcp.ingress_vip }}
+    ingressVIPs: 
+      - {{ dhcp.ingress_vip }}
 {% endif %}
 {% endif %}
 {% endif %}
