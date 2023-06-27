@@ -73,6 +73,16 @@
         ignition_url: "http://{{ helper.ipaddr }}:{{ http_port }}/ignition"
         coreos_inst_url: "coreos.live.rootfs_url=http://{{ helper.ipaddr }}:{{ http_port }}/install/rootfs.img"    
 
+    - name: Set day2_ignition
+      block:
+        - assert:
+            that: "{{ install_type == 'assisted' }}"
+        - set_fact:
+            day2_ignition: "{{ install_type }}-day2.ign"
+      rescue:
+        - set_fact:
+            day2_ignition: "worker.ign"
+
     - name: create grub.cfg
       copy:
         dest: /var/lib/tftpboot/boot/grub2/grub.cfg
@@ -119,7 +129,7 @@
     - name: generate grub entry (day2_workers)
       vars:
         role: worker
-        ignition: "{{ install_type }}-day2.ign"
+        ignition: "{{ day2_ignition }}"
         name: "{{ item.name }}"
         mac: "{{ item.macaddr }}"
         ipaddr: "{{ item.ipaddr }}"

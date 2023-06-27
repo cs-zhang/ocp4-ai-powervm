@@ -13,10 +13,14 @@
 
 - name: Day2 for assisted installer
   when: install_type == "assisted"
+  environment:
+    KUBECONFIG: "{{ kubeconfig_file }}"
   include: assisted.yaml
 
 - name: Day2 for agent based installer
-  when: install_type != "assisted"
+  when: install_type == "agent"
+  environment:
+    KUBECONFIG: "{{ kubeconfig_file }}"
   include: agent.yaml
 
 - name: Day2 for SNO install

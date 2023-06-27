@@ -108,7 +108,7 @@
     status_code: 200
   register: cluster_status
   until: cluster_status.json.status == "installing"
-  retries: 10
+  retries: 20
   delay: 30
 
 - name: Waiting for bootstrap completed

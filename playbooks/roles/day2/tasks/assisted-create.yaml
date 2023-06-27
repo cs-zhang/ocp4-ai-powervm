@@ -1,3 +1,6 @@
+- name: Get access Token
+  include_tasks: ../../ignition/tasks/assisted-refresh-token.yaml
+
 # - name: Get cluster info from output json file
 #   set_fact:
 #     day1_cluster_info: '{{ lookup("file", "{{ workdir }}/assisted-create-output.json") | from_json }}'
