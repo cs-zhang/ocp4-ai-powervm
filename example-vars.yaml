@@ -83,7 +83,7 @@ rhcos_base_url: "https://mirror.openshift.com/pub/openshift-v4/{{ rhcos_arch }}/
 # rhcos_rhcos_base: "pre-release"
 # rhcos_rhcos_tag: "45.82.202006191459-0"
 # for release build
-rhcos_rhcos_base: "4.12"
+rhcos_rhcos_base: "4.13"
 rhcos_rhcos_tag: "latest"
 rhcos_iso: "{{ rhcos_base_url}}/{{ rhcos_rhcos_base }}/{{ rhcos_rhcos_tag }}/rhcos-live.{{ rhcos_arch }}.iso"
 rhcos_rootfs: "{{ ocp_base_url}}/{{ ocp_rhcos_base }}/{{ ocp_rhcos_tag }}/rhcos-live-rootfs.{{ rhcos_arch }}.img"
@@ -99,7 +99,7 @@ ocp_base_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ocp_client_arch 
 #ocp_client_tag: "4.7.0-0.nightly-ppc64le-2020-11-05-164124"
 # for release build
 ocp_client_base: "ocp"
-ocp_client_tag: "latest-4.12"
+ocp_client_tag: "latest-4.13"
 ocp_client: "{{ ocp_base_url}}/{{ ocp_client_base }}/{{ ocp_client_tag }}/openshift-client-linux.tar.gz"
 ocp_installer: "{{ ocp_base_url}}/{{ ocp_client_base }}/{{ ocp_client_tag }}/openshift-install-linux.tar.gz"
 
@@ -119,7 +119,7 @@ pvm_hmc: <hmc_user>@<hmc_host>
 #   assisted: assisted installer
 #   sno: normal OCP SNO installation
 #   normal: normal OCP UPI installation, require bootstrap
-install_type: assisted
+install_type: agent
 
 #####################################
 # variables defined for assisted installer
@@ -129,14 +129,12 @@ install_type: assisted
 # assisted_rhcos_version: RHCOS version to install
 #####################################
 # for local assisted service
-assisted_url: http://9.47.87.83:8090/api/assisted-install/v2
+#assisted_url: http://9.47.87.83:8090/api/assisted-install/v2
 # for official AI service:
-#assisted_url: "https://api.openshift.com/api/assisted-install/v2" 
-# for RH integration AI service:
-#assisted_url: "https://api.integration.openshift.com/api/assisted-install/v2"
-# offline token for AI service
-#assisted_token: "eyJhbGciOiJIUzI1NiIs........."
-assisted_ocp_version: "4.13-multi"
+assisted_url: "https://api.openshift.com/api/assisted-install/v2" 
+# offline token for AI service, need the real offline token from RedHat site
+assisted_token: "eyJhbGciOiJIUzI1NiIs........."
+assisted_ocp_version: "4.13"
 assisted_rhcos_version: "4.13"
 
 ####################################
