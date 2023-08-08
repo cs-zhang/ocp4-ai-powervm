@@ -23,5 +23,6 @@ assisted_net_dualstack: false
 # deploy OpenShift Data Foundation
 assisted_deploy_odf_operator: false
 ####################################
+force_ocp_download: false
 pull_secret: "{{ lookup('file', '~/.openshift/pull-secret') | from_json | to_json }}"
 public_ssh_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"

@@ -14,7 +14,7 @@
 - meta: end_play
   when: dir_status.stat.exists
 
-- name: Setup openshift workdir
+- name: Setup openshift workdir {{ workdir }}
   file:
     path: "{{ workdir }}"
     state: "{{ item }}"
@@ -34,15 +34,17 @@
   when: (install_type == "sno") or (install_type == "normal")
   include: sno.yaml
 
-- name: Get pxe files and ignition from ISO and copy to right place
-  when: (install_type == "agent") or (install_type == "assisted")
+- name: Get pxe files and ignition from ISO
+  when: install_type == "agent" or install_type == "assisted"
+  shell: |
+    coreos-installer iso ignition show {{ install_type }}.iso > {{ install_type }}.ign
+    coreos-installer iso extract pxe {{ install_type }}.iso
+  args:
+    chdir: "{{ workdir }}"
+
+- name: Copy pxe files to right place
+  when: force_ocp_download != true and (install_type == "agent" or install_type == "assisted")
   block:
-  - name: Get pxe and ignition from ISO
-    shell: |
-      coreos-installer iso ignition show {{ install_type }}.iso > {{ install_type }}.ign
-      coreos-installer iso extract pxe {{ install_type }}.iso
-    args:
-      chdir: "{{ workdir }}"
   - name: Host initramfs.img
     become: true
     copy:

@@ -14,14 +14,14 @@
     when: force_ocp_download
 
   - name: Downloading OCP4 rhcos-live.iso
-    when: rhcos_iso is defined and install_type == "download"
+    when: rhcos_iso is defined and force_ocp_download
     get_url:
         url: "{{ rhcos_iso }}"
         dest: "/usr/local/src/rhcos-live-{{ rhcos_arch }}.iso"
         mode: 0555
 
   - name: Download RHCOS images
-    when: install_type == "sno" or install_type == "normal"
+    when: force_ocp_download
     block:
     - name: Downloading OCP4 installer rootfs
       get_url:
