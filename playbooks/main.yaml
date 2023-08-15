@@ -19,7 +19,6 @@
 
 - name: Setup services for bastion
   hosts: localhost
-  become: true
   gather_facts: false
   any_errors_fatal: true
   roles:
