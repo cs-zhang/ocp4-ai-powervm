@@ -27,7 +27,7 @@
       dest: /etc/haproxy/haproxy.cfg
     notify:
       - restart haproxy
-    when: masters | length > 1 and ( dhcp.api_vip is not defined or dhcp.ingress_vip is not defined )
+    when: ( masters | length > 1 or bootstrap is defined ) and ( dhcp.api_vip is not defined or dhcp.ingress_vip is not defined )
     
   - name: Set HTTP server and prepare OCP4 bios
     block:

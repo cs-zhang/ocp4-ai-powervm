@@ -1,5 +1,5 @@
 {{ helper.ipaddr }} registry
-{% if masters | length == 1 %}
+{% if masters | length == 1 and bootstrap is not defined %}
 {{ masters[0].ipaddr }} {{ masters[0].name | lower }} api api-int
 {% else %}
 {% if dhcp.api_vip is defined %} 

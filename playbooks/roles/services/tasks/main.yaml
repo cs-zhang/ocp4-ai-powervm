@@ -72,6 +72,6 @@
     service:
       name: haproxy
       state: stopped
-    when: dhcp.api_vip is defined or masters | length == 1
+    when: dhcp.api_vip is defined or ( masters | length == 1 and bootstrap is not defined )
 
     
