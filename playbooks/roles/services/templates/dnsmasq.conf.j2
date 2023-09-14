@@ -11,6 +11,10 @@ no-hosts
 #  have your simple hosts expanded to domain
 expand-hosts
 
+# Listen on this specific port instead of the standard DNS port
+# (53). Setting this to zero completely disables DNS function,
+# leaving only DHCP and/or TFTP.
+#port=5353
 
 interface={{ networkifacename }}
 # set your domain for expand-hosts
@@ -18,7 +22,7 @@ domain={{ dns.clusterid }}.{{ dns.domain | lower }}
 local=/{{ dns.clusterid }}.{{ dns.domain | lower }}/
 {% if dhcp.ingress_vip is defined %}
 address=/apps.{{ dns.clusterid }}.{{ dns.domain | lower }}/{{ dhcp.ingress_vip }}
-{% elif masters | length == 1 %}
+{% elif masters | length == 1 and bootstrap is not defined %}
 address=/apps.{{ dns.clusterid }}.{{ dns.domain | lower }}/{{ masters[0].ipaddr }}
 {% elif dhcp.api_vip is defined %}
 address=/apps.{{ dns.clusterid }}.{{ dns.domain | lower }}/{{ dhcp.api_vip }}
@@ -44,7 +48,7 @@ dhcp-range={{ masters[0].ipaddr }},static
 dhcp-option=option:router,{{ dhcp.router }}
 dhcp-option=option:netmask,{{ dhcp.netmask }}
 dhcp-option=option:dns-server,{{ helper.ipaddr }}
-#dhcp-option=option:domain-name,{{ dns.clusterid }}.{{ dns.domain | lower }}
+dhcp-option=option:domain-name,{{ dns.clusterid }}.{{ dns.domain | lower }}
 #dhcp-option=option:domain-search,{{ dns.domain | lower }}
 
 {% if bootstrap is defined %}
