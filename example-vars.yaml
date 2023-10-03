@@ -62,13 +62,14 @@ masters:
 
 ########################
 # Disk encryption, if set it to true, ned to define tang
-disk_encryption: false
 # define tang used for disk encryption
-# tang:
+# luks:
+#   enabled: false
+#   config:
 #     - url: "http://9.114.97.111:7500"
-#       thumbprint: "nOroi1iGJih6Ao-NHNq1FkDySm8"
+#       thumbprint: "xxxxxxxxxxxxxx"
 #     - url: "http://9.114.97.236:7500"
-#       thumbprint: "LOw01jB9m756FoCoWzqEUSKS2-E"
+#       thumbprint: "xxxxxxxxxxxxxx"
 
 ########################
 #force_ocp_download: false
@@ -128,8 +129,6 @@ install_type: agent
 # assisted_ocp_version: OCP version to install
 # assisted_rhcos_version: RHCOS version to install
 #####################################
-# for local assisted service
-#assisted_url: http://9.47.87.83:8090/api/assisted-install/v2
 # for official AI service:
 assisted_url: "https://api.openshift.com/api/assisted-install/v2" 
 # offline token for AI service, need the real offline token from RedHat site
@@ -151,6 +150,12 @@ log_level: info
 #release_image_override: quay.io/openshift-release-dev/ocp-release:4.12.0-ppc64le
 #cni_network_provider: OpenShiftSDN
 #openshift_installer: "~/ocp-ipi/ocp-agent/openshift-install"
+
+###################################
+# Variables for customization 
+rhcos_kernel_options: []
+sysctl_tuned_options: false
+powervm_rmc: true
 
 ########################
 # local registry

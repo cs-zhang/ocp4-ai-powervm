@@ -6,16 +6,34 @@ rhcos_arch: ppc64le
 ocp_client_arch: ppc64le
 log_level: info
 release_image_override: ""
+proxy_url: ""
+no_proxy: ""
+enable_local_registry: false
 cni_network_provider: OVNKubernetes
 storage_type: ""
 node_connection_timeout: 2700
 openshift_installer: "openshift-install"
 disk: "/dev/sda"
-# disk encryption
-disk_encryption: false
 # using static IP
 static_ip: false
+################################
+# disk encryption
+fips_compliant: false
+luks:
+   enabled: false
+   filesystem_device: /dev/mapper/root
+   format: xfs
+   wipeFileSystem: true
+   device: /dev/disk/by-partlabel/root
+   label: luks-root
+   options:
+      - --cipher
+      - aes-cbc-essiv:sha256
+   wipeVolume: true
+   name: root
+disk_encryption: "{{ luks.enabled }}"
 #####################################
+assisted_url: "https://api.openshift.com/api/assisted-install/v2"
 assisted_token: ""
 assisted_exist_cluster: false
 # deploy with dual IP stack

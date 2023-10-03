@@ -1,5 +1,5 @@
 [
-{% for item in tang  %}
+{% for item in luks.config  %}
 {% if item.thumbprint is not none and item.url is not none %}
     {
         "url": "{{ item.url }}",

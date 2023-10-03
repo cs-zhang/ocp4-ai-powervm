@@ -73,3 +73,4 @@ proxy:
   httpsProxy: {{ proxy_url }}
   noProxy: .{{ dns.clusterid }}.{{ dns.domain }},{{ no_proxy }}
 {% endif %}
+fips: {{ fips_compliant }}

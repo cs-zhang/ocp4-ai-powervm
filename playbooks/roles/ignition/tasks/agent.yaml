@@ -21,7 +21,24 @@
       remote_src: yes
       force: yes      
 
-  - name: Create ignition for agent based install
+  - name: Generate manifest files
+    shell: |
+      OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE={{ release_image_override }} {{ openshift_installer }} agent create manifests --log-level {{ log_level }}
+    args:
+      chdir: "{{ workdir }}"
+
+  # - name: Create Machine Config for disk encryption
+  #   when: luks.enabled|bool and luks.config|length > 0
+  #   vars:
+  #     role_n: '{{ item }}'
+  #   template:
+  #     src: ../templates/99-node-machineconfig.yaml.j2
+  #     dest: "{{ workdir }}/openshift/99-{{ item }}-machineconfig.yaml"
+  #   with_items:
+  #     - master
+  #     - worker
+
+  - name: Create ISO image for agent based install
     shell: |
       OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE={{ release_image_override }} {{ openshift_installer }} agent create image --log-level {{ log_level }}
     args:

@@ -16,7 +16,7 @@
     status_code: 201
 
 - name: Patch cluster for disk encryption
-  when: disk_encryption is defined and disk_encryption|bool
+  when: luks.enabled|bool and luks.config|length > 0
   import_tasks: assisted-patch-disk.yaml
     
 - name: Patch cluster for static-ip.json
