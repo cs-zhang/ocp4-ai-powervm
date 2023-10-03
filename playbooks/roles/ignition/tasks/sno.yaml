@@ -11,12 +11,13 @@
       force: yes
 
   - name: Generate manifest files
-    shell: "openshift-install create manifests --log-level {{ log_level }}"
+    shell: |
+      OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE={{ release_image_override }} openshift-install create manifests --log-level {{ log_level }}
     args:
       chdir: "{{ workdir }}"
       
   - name: Create Machine Config for disk encryption
-    when: disk_encryption is defined and disk_encryption|bool and tang|length > 0
+    when: luks.enabled|bool and luks.config|length > 0
     vars:
       role_n: '{{ item }}'
     template:

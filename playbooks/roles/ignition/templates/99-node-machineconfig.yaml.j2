@@ -9,25 +9,29 @@ spec:
     ignition:
       version: 3.2.0
     storage:
+      filesystems:
+        - device: {{ luks.filesystem_device }}
+          format: {{ luks.format }}
+          label: {{ luks.name }}
+          wipeFilesystem: {{ luks.wipeFileSystem }}
       luks:
-        - name: root
-          device: /dev/disk/by-partlabel/root
+        - name: {{ luks.name }}
+          device: {{ luks.device }}
+          label: {{ luks.label }}
+          options:
+{% for item in luks.options %}
+            - {{ item }}
+{% endfor %}
+          wipeVolume: true
           clevis:
             tang:
-{% for item in tang  %}
+{% for item in luks.config  %}
 {% if item.thumbprint is not none and item.url is not none %}
               - thumbprint: {{ item.thumbprint}}
                 url: {{ item.url }}
 {% endif %}
 {% endfor %}
             threshold: 1
-          options: [--cipher, aes-cbc-essiv:sha256]
-          wipeVolume: true
-      filesystems:
-        - device: /dev/mapper/root
-          format: xfs
-          wipeFilesystem: true
-          label: root
   kernelArguments:
     - rd.neednet=1
 

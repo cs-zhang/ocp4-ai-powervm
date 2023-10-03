@@ -46,3 +46,9 @@
   roles:
   - monitor
 
+# - name: Customize OCP installation
+#   hosts: localhost
+#   gather_facts: false
+#   any_errors_fatal: true
+#   roles:
+#   - customization
