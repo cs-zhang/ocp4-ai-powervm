@@ -454,32 +454,7 @@ cd ~/agent-works
 ./openshift-install agent wait-for install-complete --log-level=info
 ```
 
-There is another way to enable WEB UI for assisted-service to show the progress up to rendezvousIP(bootstrap) reboot, here is the script `agent-ui`:
-```shell
-cat > agent-ui << EOF
-  # node0_ip is the IP used for rendezvousIP
-  export ASSISTED_UI="quay.io/cszhang/assisted-installer-ui:ppc64le"
 
-  if [ $# -eq 1 ]; then
-    node0_ip=$1
-    ssh_opts=(-o 'StrictHostKeyChecking=no' -o 'UserKnownHostsFile=/dev/null' -q core@${node0_ip})
-
-    until ssh "${ssh_opts[@]}" "[[ -f /run/assisted-service-pod.pod-id ]]"
-    do
-      echo "Waiting for ${node0_ip}"
-      sleep 5s;
-    done
-    echo "Start assisted-service UI: http://${node0_ip}:8080"
-    ssh "${ssh_opts[@]}" "sudo /usr/bin/podman run -d --name=assisted-ui --network host  --pod-id-file=/run/assisted-service-pod.pod-id ${ASSISTED_UI}"
-  else
-    echo "Usage: agent-ui <node0-ip>"
-  fi
-EOF
-chmod +x agent-ui
-./agent-ui <rendezvousIP>
-```
-After run `agent-ui`, you can open a browser to `http://<rendezvousIP>:8080` to check installation progress. After the `<rendezvousIP>` host reboot, the UI will not be access-able.
- 
 Also we can use `oc` to check installation status:
 ```shell
 export KUBECONFIG=~/agent-works/auth/kubeconfig
