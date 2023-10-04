@@ -293,7 +293,7 @@ Download the latest `openshift-install` from OpenShift mirror site for Power:
 ```shell
 mkdir -p ~/agent-works
 cd ~/ai-works
-wget https://mirror.openshift.com/pub/openshift-v4/ppc64le/clients/ocp/4.15.0/openshift-install-linux.tar.gz
+wget https://mirror.openshift.com/pub/openshift-v4/ppc64le/clients/ocp-dev-preview/4.15.0-ec.0/openshift-install-linux.tar.gz
 tar xzvf openshift-install-linux.tar.gz
 ```
 

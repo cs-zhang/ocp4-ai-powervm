@@ -48,6 +48,7 @@
       get_url:
         url: "{{ ocp_client }}"
         dest: /usr/local/src/openshift-client-linux.tar.gz
+        force: true
 
     - name: Unarchiving OCP4 client
       unarchive:
@@ -62,6 +63,7 @@
       get_url:
         url: "{{ ocp_installer }}"
         dest: /usr/local/src/openshift-install-linux.tar.gz
+        force: true
 
     - name: Unarchiving OCP4 Installer
       unarchive:
