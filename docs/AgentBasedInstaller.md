@@ -458,34 +458,41 @@ chmod +x agent-tui.sh
 ```
 Here are some screens:
 ```
- ╔════════════════════  Agent installer network boot setup  ════════════════════╗                                                                    ║┌───────────────────────────  Release image URL  ────────────────────────────┐║                                                                    ║│                                                                            │║                                                                    
- ║│ ✓ quay.io/openshift-release-dev/ocp-release@sha256:034e911a3e80ade5d3a8584…│║                                                                    ║│                                                                            │║                                                                    ║└────────────────────────────────────────────────────────────────────────────┘║                                                                    ║                                                                              ║                                                                    ║                        <Configure network>     <Quit>                        ║                                                                    ║                                                                              ║                                                                    ╚══════════════════════════════════════════════════════════════════════════════╝
+ ╔════════════════════  Agent installer network boot setup  ════════════════════╗ 
+ ║┌───────────────────────────  Release image URL  ────────────────────────────┐║ 
+ ║│                                                                            │║ 
+ ║│ ✓ quay.io/openshift-release-dev/ocp-release@sha256:034e911a3e80ade5d3a8584…│║
+ ║│                                                                            │║ 
+ ║└────────────────────────────────────────────────────────────────────────────┘║ 
+ ║                                                                              ║ 
+ ║                        <Configure network>     <Quit>                        ║ 
+ ║                                                                              ║ 
+ ╚══════════════════════════════════════════════════════════════════════════════╝
 
-         ╔════════════════════════════════════════════════════════════════════════╗
-      ┌──║                                                                        ║──┐
-      │┌─║    Agent-based installer connectivity checks passed. No additional     ║─┐│
-      ││ ║   network configuration is required.Do you still wish to modify the    ║ ││
-      ││ ║                  network configuration for this host?                  ║…││
-      ││ ║                                                                        ║ ││
-      │└─║                 This prompt will timeout in 14 seconds.                ║─┘│
-      │  ║                                                                        ║  │
-      │  ║                             <Yes>     <No>                             ║  │
-      │  ║                                                                        ║  │
-      └──╚════════════════════════════════════════════════════════════════════════╝──┘
-
-      ┌─┤ NetworkManager TUI ├──┐
-		  │                         │
-		  │ Please select an option │
-		  │                         │
-		  │ Edit a connection       │
-		  │ Activate a connection   │
-		  │ Set system hostname     │
-		  │                         │
-		  │ Quit                    │
-		  │                         │
-		  │                    <OK> │
-		  │                         │
-		  └─────────────────────────┘
+   ╔════════════════════════════════════════════════════════════════════════╗
+┌──║                                                                        ║──┐
+│┌─║    Agent-based installer connectivity checks passed. No additional     ║─┐│
+││ ║   network configuration is required.Do you still wish to modify the    ║ ││
+││ ║                  network configuration for this host?                  ║…││
+││ ║                                                                        ║ ││
+│└─║                 This prompt will timeout in 14 seconds.                ║─┘│
+│  ║                                                                        ║  │
+│  ║                             <Yes>     <No>                             ║  │
+│  ║                                                                        ║  │
+└──╚════════════════════════════════════════════════════════════════════════╝──┘
+┌─┤ NetworkManager TUI ├──┐
+│                         │
+│ Please select an option │
+│                         │
+│ Edit a connection       │
+│ Activate a connection   │
+│ Set system hostname     │
+│                         │
+│ Quit                    │
+│                         │
+│                    <OK> │
+│                         │
+└─────────────────────────┘
 
   ┌───────────────────────────┤ Edit Connection ├───────────────────────────┐
   │                                                                         │
