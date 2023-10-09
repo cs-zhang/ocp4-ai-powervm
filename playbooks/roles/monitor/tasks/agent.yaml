@@ -99,17 +99,9 @@
         - workers | length > 0
 
 
-- name: Wait for installation to start
-  uri:
-    url: "{{ api_url }}/clusters/{{ cluster_id }}"
-    method: GET
-    body_format: json
-    return_content: yes
-    status_code: 200
-  register: cluster_status
-  until: cluster_status.json.status == "installing"
-  retries: 20
-  delay: 30
+- name: Wait for OpenShift cluster installation start.
+  include_tasks:  agent-wait-start.yaml
+  loop: "{{ range(1,5,1) | list}}"
 
 - name: Waiting for bootstrap completed
   shell: "{{ openshift_installer }} agent wait-for bootstrap-complete --log-level {{ log_level }}"
