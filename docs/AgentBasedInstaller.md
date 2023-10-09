@@ -432,16 +432,112 @@ To boot PowerVM with netboot, there are two ways to do it: using SMS interactive
 
 Here is the `lpar_netboot` command:
 ```shell
-lpar_netboot -i -D -f -t ent -m <sno_mac> -s auto -d auto -S <server_ip> -C <sno_ip> -G <gateway> <lpar_name> default_profile <cec_name>
+lpar_netboot -i -D -f -t ent -m <client_mac> -s auto -d auto -S <server_ip> -C <client_ip> -G <gateway_ip> <lpar_name> default_profile <cec_name>
 ```
 Note:
-- <sno_mac>: MAC address of node
-- <sno_ip>:  IP address of node
+- <client_mac>: MAC address of client node
+- <client_ip>:  IP address of client node
 - <server_ip>: IP address of bastion (PXE server)
-- <gateway>: Network's gateway IP
-- <lpar_name>: Node lpar name in HMC
+- <gateway_ip>: Network's gateway IP
+- <lpar_name>: Client node lpar name in HMC
 - <cec_name>: System name where the lpar resident on
 
+### Start agent text based interactive  UI
+The agent-based installer provides a text based interactive config UI, and it should be run on rendezvous host. Here are the steps to do it:
+```shell
+ssh core@<rendezvous_ip>
+cat > agent-tui.sh << EOF
+sudo mkdir -p /var/log/agent
+agent_log="/var/log/agent/agent-tui.log"
+agent_path="/usr/local/bin"
+release_image=$(sudo cat /etc/assisted/agent-installer.env)
+sudo LD_LIBRARY_PATH=${agent_path} ${release_image} AGENT_TUI_LOG_PATH=${agent_log} ${agent_path}/agent-tui
+EOF
+chmod +x agent-tui.sh
+./agent-tui.sh
+```
+Here are some screens:
+```
+ ╔════════════════════  Agent installer network boot setup  ════════════════════╗                                                                    ║┌───────────────────────────  Release image URL  ────────────────────────────┐║                                                                    ║│                                                                            │║                                                                    
+ ║│ ✓ quay.io/openshift-release-dev/ocp-release@sha256:034e911a3e80ade5d3a8584…│║                                                                    ║│                                                                            │║                                                                    ║└────────────────────────────────────────────────────────────────────────────┘║                                                                    ║                                                                              ║                                                                    ║                        <Configure network>     <Quit>                        ║                                                                    ║                                                                              ║                                                                    ╚══════════════════════════════════════════════════════════════════════════════╝
+
+         ╔════════════════════════════════════════════════════════════════════════╗
+      ┌──║                                                                        ║──┐
+      │┌─║    Agent-based installer connectivity checks passed. No additional     ║─┐│
+      ││ ║   network configuration is required.Do you still wish to modify the    ║ ││
+      ││ ║                  network configuration for this host?                  ║…││
+      ││ ║                                                                        ║ ││
+      │└─║                 This prompt will timeout in 14 seconds.                ║─┘│
+      │  ║                                                                        ║  │
+      │  ║                             <Yes>     <No>                             ║  │
+      │  ║                                                                        ║  │
+      └──╚════════════════════════════════════════════════════════════════════════╝──┘
+
+      ┌─┤ NetworkManager TUI ├──┐
+		  │                         │
+		  │ Please select an option │
+		  │                         │
+		  │ Edit a connection       │
+		  │ Activate a connection   │
+		  │ Set system hostname     │
+		  │                         │
+		  │ Quit                    │
+		  │                         │
+		  │                    <OK> │
+		  │                         │
+		  └─────────────────────────┘
+
+  ┌───────────────────────────┤ Edit Connection ├───────────────────────────┐
+  │                                                                         │
+  │         Profile name env32___________________________________           │
+  │               Device env32 (FA:1D:67:35:13:20)_______________           │
+  │                                                                         │
+  │ ╤ ETHERNET                                                    <Hide>    │
+  │ │ Cloned MAC address FA:1D:67:35:13:20_______________________           │
+  │ │                MTU __________ (default)                               │
+  │ └                                                                       │
+  │ ═ 802.1X SECURITY                                             <Show>    │
+  │                                                                         │
+  │ ═ IPv4 CONFIGURATION <Automatic>                              <Show>    │
+  │ ═ IPv6 CONFIGURATION <Disabled>                               <Show>    │
+  │                                                                         │
+  │ [X] Automatically connect                                               │
+  │ [X] Available to all users                                              │
+  │                                                                         │
+  │                                                           <Cancel> <OK> │
+  │                                                                         │
+  │                                                                         │
+  │                                                                         │
+  │                                                                         │
+  │                                                                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+      ╔═════════════════════════════Network Status═════════════════════════════╗
+      ║master-1                                                                ║
+      ║├──Interfaces                                                           ║
+      ║│  ├──env32 (ethernet)                                                  ║
+      ║│  │  ├──MTU: 1500                                                      ║
+      ║│  │  ├──State: up                                                      ║
+   ┌──║│  │  └──IPv4 Addresses                                                 ║──┐
+   │┌─║│  │     └──9.114.97.242/22                                             ║─┐│
+   ││ ║│  ├──cni-podman0 (linux-bridge)                                        ║ ││
+   ││ ║│  │  ├──MTU: 1500                                                      ║…││
+   ││ ║│  │  ├──State: up                                                      ║ ││
+   │└─║│  │  ├──IPv4 Addresses                                                 ║─┘│
+   │  ║│  │  │  └──10.88.0.1/16                                                ║  │
+   │  ║│  │  └──IPv6 Addresses                                                 ║  │
+   │  ║│  │     └──fe80::2023:c0ff:fe28:2f8f/64                                ║  │
+   └──║│  ├──lo (loopback)                                                     ║──┘
+      ║│  │  ├──MTU: 65536                                                     ║
+      ║│  │  ├──State: up                                                      ║
+      ║│  │  ├──IPv4 Addresses                                                 ║
+      ║│  │  │  └──127.0.0.1/8                                                 ║
+      ║│  │  └──IPv6 Addresses                                                 ║
+      ║│  │     └──::1/128                                                     ║
+      ║│  └──veth54498b3f (veth)                                               ║
+      ╚════════════════════════════════════════════════════════════════════════╝
+
+```
 
 ### Monitoring the progress
 After all lpars booted up with PXE, we can use `openshift-install` to monitor the progress of installation.
