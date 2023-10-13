@@ -20,7 +20,7 @@
       timeout=1
       menuentry "CoreOS (BIOS)" {
          echo "Loading kernel"
-         linux "/rhcos/kernel" {{ ip_config }} rd.neednet=1 ignition.platform.id=metal ignition.firstboot {{ coreos_inst_url }} ignition.config.url={{ ignition_url }}/{{ ignition }}
+         linux "/rhcos/kernel" {{ ip_config }} console=tty0 console=ttyS0 console=hvc0,115200n8 rd.neednet=1 ignition.platform.id=metal ignition.firstboot {{ coreos_inst_url }} ignition.config.url={{ ignition_url }}/{{ ignition }}
 
          echo "Loading initrd"
          initrd  "/rhcos/initramfs.img"
@@ -39,7 +39,7 @@
       timeout=1
       menuentry "CoreOS (BIOS)" {
          echo "Loading kernel for {{ name }}"
-         linux "/rhcos/kernel" {{ ip_config }} rd.neednet=1 {{ multipath }} coreos.inst=yes coreos.inst.install_dev={{ mdisk }} {{ coreos_inst_url }} coreos.inst.ignition_url={{ ignition_url }}/{{ role }}.ign ignition.config.url={{ ignition_url }}/first-boot-ppc64le-{{ name }}.ign
+         linux "/rhcos/kernel" {{ ip_config }} console=tty0 console=ttyS0 console=hvc0,115200n8 rd.neednet=1 {{ multipath }} coreos.inst=yes coreos.inst.install_dev={{ mdisk }} {{ coreos_inst_url }} coreos.inst.ignition_url={{ ignition_url }}/{{ role }}.ign ignition.config.url={{ ignition_url }}/first-boot-ppc64le-{{ name }}.ign
 
          echo "Loading initrd"
          initrd  "/rhcos/initramfs.img"

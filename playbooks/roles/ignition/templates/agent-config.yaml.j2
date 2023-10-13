@@ -19,7 +19,7 @@ hosts:
             enabled: true
             address:
               - ip: {{ m.ipaddr }}
-                prefix-length: 24
+                prefix-length: {{ dhcp.subnet.split('/').1 }}
 {% if static_ip|bool %}
             dhcp: false
       dns-resolver:
@@ -53,7 +53,7 @@ hosts:
             enabled: true
             address:
               - ip: {{ w.ipaddr }}
-                prefix-length: 24
+                prefix-length: {{ dhcp.subnet.split('/').1 }}
 {% if static_ip|bool %}
             dhcp: false
       dns-resolver:
