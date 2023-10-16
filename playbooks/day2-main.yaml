@@ -1,16 +1,14 @@
 ---
 # file: add-workers.yaml
 
-- hosts: all
+- name: Setup services for bastion
+  hosts: all
   vars_files:
     - defaults/main.yaml
   handlers:
   - import_tasks: handlers/main.yml
-
-- name: Setup services for bastion
-  hosts: all
   become: true
-  gather_facts: false
+  gather_facts: true
   any_errors_fatal: true
   vars:
     force_ocp_download: false
@@ -19,6 +17,8 @@
 
 - name: Do day2 tasks to add more workers to exist cluster
   hosts: all
+  vars_files:
+    - defaults/main.yaml
   become: false
   gather_facts: false
   any_errors_fatal: true

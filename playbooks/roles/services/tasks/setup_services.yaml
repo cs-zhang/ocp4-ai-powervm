@@ -47,6 +47,10 @@
         - /var/www/html/install
         - /var/www/html/ignition
 
+  - name: Setup Squid proxy server
+    import_tasks: squid.yaml
+    when: setup_squid_proxy
+
   - name: generate netboot entry for grub2
     shell: grub2-mknetdir --net-directory=/var/lib/tftpboot
 

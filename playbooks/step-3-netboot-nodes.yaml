@@ -1,12 +1,5 @@
 ---
 # file: main.yml
-
-- hosts: localhost
-  vars_files:
-    - defaults/main.yaml
-  handlers:
-  - import_tasks: handlers/main.yml
-
 - name: Net boot localhost cluster nodes
   hosts: localhost
   gather_facts: false
