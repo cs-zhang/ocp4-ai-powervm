@@ -1,11 +1,11 @@
-- hosts: all
+---
+- name: Setup services for bastion
+  hosts: all
   vars_files:
     - defaults/main.yaml
   handlers:
   - import_tasks: handlers/main.yml
-
-- name: Setup services for bastion
-  hosts: all
+  become: true
   gather_facts: false
   any_errors_fatal: true
   vars:

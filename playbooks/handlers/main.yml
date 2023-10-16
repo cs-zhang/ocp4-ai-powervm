@@ -15,5 +15,8 @@
     name: nfs-server
     state: restarted
 
-
+- name: restart squid
+  service:
+    name: squid
+    state: restarted
 

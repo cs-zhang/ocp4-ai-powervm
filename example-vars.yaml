@@ -13,8 +13,6 @@ dhcp:
   router: "192.168.79.2"
   netmask: "255.255.255.0"
   subnet: "192.168.79.0/24"
-  # api_vip: "192.168.79.5"
-  # ingress_vip: "192.168.79.4"
 # bootstrap: 
 #   name: "bootstrap"
 #   ipaddr: "9.47.89.30"
@@ -57,19 +55,6 @@ masters:
 #     pvmcec: "C340F21U13"
 #     pvmlpar: "cs-ocp-sno-89bf5d67-000072d1"
 
-########################
-#static_ip: false
-
-########################
-# Disk encryption, if set it to true, ned to define tang
-# define tang used for disk encryption
-# luks:
-#   enabled: false
-#   config:
-#     - url: "http://9.114.97.111:7500"
-#       thumbprint: "xxxxxxxxxxxxxx"
-#     - url: "http://9.114.97.236:7500"
-#       thumbprint: "xxxxxxxxxxxxxx"
 
 ########################
 #force_ocp_download: false
@@ -122,19 +107,6 @@ pvm_hmc: <hmc_user>@<hmc_host>
 #   normal: normal OCP UPI installation, require bootstrap
 install_type: agent
 
-#####################################
-# variables defined for assisted installer
-# assisted_url: define the assisted service access point
-# assisted_token: offline token for secure assisted service access, optional
-# assisted_ocp_version: OCP version to install
-# assisted_rhcos_version: RHCOS version to install
-#####################################
-# for official AI service:
-assisted_url: "https://api.openshift.com/api/assisted-install/v2" 
-# offline token for AI service, need the real offline token from RedHat site
-assisted_token: "eyJhbGciOiJIUzI1NiIs........."
-assisted_ocp_version: "4.13"
-assisted_rhcos_version: "4.13"
 
 ####################################
 # the default place for pull-secret and id_rsa.pub
@@ -145,34 +117,3 @@ assisted_rhcos_version: "4.13"
 workdir: "/home/cloud-user/ocp4-{{ install_type }}"
 log_level: info
 
-###################################
-# optional variables
-#release_image_override: quay.io/openshift-release-dev/ocp-release:4.12.0-ppc64le
-#cni_network_provider: OpenShiftSDN
-#openshift_installer: "~/ocp-ipi/ocp-agent/openshift-install"
-
-###################################
-# Variables for customization 
-rhcos_kernel_options: []
-sysctl_tuned_options: false
-powervm_rmc: true
-
-########################
-# local registry
-setup_registry:
-  deploy: false
-#   autosync_registry: true
-#   registry_image: docker.io/ibmcom/registry-ppc64le:2.6.2.5
-#   local_repo: "ocp4/openshift4"
-#   product_repo: "openshift-release-dev"
-#   release_name: "ocp-release"
-#   release_tag: "4.12.0-ppc64le"
-
-###################################
-# storage_type could be: "" or "nfs"
-#storage_type: nfs
-
-##################################
-# setup the predefined proxy
-#proxy_url: http://192.168.79.2:3128
-#no_proxy: 127.0.0.0/16

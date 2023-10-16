@@ -67,10 +67,10 @@ imageContentSources:
 {% else %}
 pullSecret: '{{ pull_secret }}'
 {% endif %}
-{% if  proxy_url is defined and proxy_url != "" %}
+{% if setup_squid_proxy or proxy_url != "" %}
 proxy:
-  httpProxy: {{ proxy_url }}
-  httpsProxy: {{ proxy_url }}
+  httpProxy: {{ squid_proxy_url | default(proxy_url) }}
+  httpsProxy: {{ squid_proxy_url | default(proxy_url) }}
   noProxy: .{{ dns.clusterid }}.{{ dns.domain }},{{ no_proxy }}
 {% endif %}
 fips: {{ fips_compliant }}

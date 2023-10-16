@@ -1,12 +1,5 @@
 ---
 # file: main.yml
-
-- hosts: localhost
-  vars_files:
-    - defaults/main.yaml
-  handlers:
-  - import_tasks: handlers/main.yml
-
 - name: Cleanup old files
   hosts: localhost
   gather_facts: false
@@ -19,13 +12,19 @@
 
 - name: Setup services for bastion
   hosts: localhost
-  gather_facts: false
+  vars_files:
+  - defaults/main.yaml
+  handlers:
+  - import_tasks: handlers/main.yml
+  gather_facts: true
   any_errors_fatal: true
   roles:
   - services
 
 - name: Create OCP ignition file
   hosts: localhost
+  vars_files:
+  - defaults/main.yaml
   gather_facts: false
   any_errors_fatal: true
   tasks:

@@ -1,14 +1,9 @@
 ---
 # file: main.yml
-
-- hosts: localhost
-  vars_files:
-    - defaults/main.yaml
-  handlers:
-  - import_tasks: handlers/main.yml
-
 - name: Monitor OCP installation progress
   hosts: localhost
+  vars_files:
+    - defaults/main.yaml
   gather_facts: true
   any_errors_fatal: true
   vars:

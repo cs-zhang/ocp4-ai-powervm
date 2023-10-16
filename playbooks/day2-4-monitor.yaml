@@ -1,7 +1,5 @@
 ---
 # Monitor day2 worker nodes
-
-
 - hosts: all    
   vars_files:
     - defaults/main.yaml

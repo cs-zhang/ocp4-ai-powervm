@@ -1,6 +1,5 @@
 ---
 # Boot up day2 worker nodes
-
 - hosts: all    
   tasks:
   - name: Netboot all day2 workers
