@@ -9,7 +9,7 @@
       status_code: 200
     register: cluster_status
     until: cluster_status.json.status == "installing"
-    retries: 20
+    retries: 30
     delay: 30
 
   rescue:
