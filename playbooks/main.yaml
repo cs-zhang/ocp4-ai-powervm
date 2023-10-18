@@ -41,7 +41,9 @@
 
 - name: Monitor OCP installation progress
   hosts: localhost
-  gather_facts: false
+  vars_files:
+    - defaults/main.yaml
+  gather_facts: true
   any_errors_fatal: true
   roles:
   - monitor

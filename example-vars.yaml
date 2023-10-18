@@ -72,9 +72,9 @@ rhcos_base_url: "https://mirror.openshift.com/pub/openshift-v4/{{ rhcos_arch }}/
 rhcos_rhcos_base: "4.13"
 rhcos_rhcos_tag: "latest"
 rhcos_iso: "{{ rhcos_base_url}}/{{ rhcos_rhcos_base }}/{{ rhcos_rhcos_tag }}/rhcos-live.{{ rhcos_arch }}.iso"
-rhcos_rootfs: "{{ ocp_base_url}}/{{ ocp_rhcos_base }}/{{ ocp_rhcos_tag }}/rhcos-live-rootfs.{{ rhcos_arch }}.img"
-rhcos_initramfs: "{{ ocp_base_url}}/{{ ocp_rhcos_base }}/{{ ocp_rhcos_tag }}/rhcos-live-initramfs.{{ rhcos_arch }}.img"
-rhcos_kernel: "{{ ocp_base_url}}/{{ ocp_rhcos_base }}/{{ ocp_rhcos_tag }}/rhcos-live-kernel-{{ rhcos_arch }}"
+rhcos_rootfs: "{{ rhcos_base_url}}/{{ rhcos_rhcos_base }}/{{ rhcos_rhcos_tag }}/rhcos-live-rootfs.{{ rhcos_arch }}.img"
+rhcos_initramfs: "{{ rhcos_base_url}}/{{ rhcos_rhcos_base }}/{{ rhcos_rhcos_tag }}/rhcos-live-initramfs.{{ rhcos_arch }}.img"
+rhcos_kernel: "{{ rhcos_base_url}}/{{ rhcos_rhcos_base }}/{{ rhcos_rhcos_tag }}/rhcos-live-kernel-{{ rhcos_arch }}"
 ########################
 # URL path to OCP clients download site
 ocp_client_arch: "ppc64le"
