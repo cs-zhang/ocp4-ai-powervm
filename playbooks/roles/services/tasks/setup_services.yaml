@@ -75,7 +75,16 @@
     - set_fact:
         install_url: "http://{{ helper.ipaddr }}:{{ http_port }}/install"
         ignition_url: "http://{{ helper.ipaddr }}:{{ http_port }}/ignition"
-        coreos_inst_url: "coreos.live.rootfs_url=http://{{ helper.ipaddr }}:{{ http_port }}/install/rootfs.img"    
+
+    - name: Set coreos_inst_url
+      block:
+        - assert:
+            that: "{{ enable_remote_rootfs }}"
+        - set_fact:
+            coreos_inst_url: "coreos.live.rootfs_url={{ rhcos_rootfs }}"
+      rescue:
+        - set_fact:
+            coreos_inst_url: "coreos.live.rootfs_url=http://{{ helper.ipaddr }}:{{ http_port }}/install/rootfs.img"
 
     - name: Set day2_ignition
       block:
