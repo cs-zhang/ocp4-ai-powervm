@@ -18,6 +18,7 @@
   - import_tasks: handlers/main.yml
   gather_facts: true
   any_errors_fatal: true
+  become: true
   roles:
   - services
 
