@@ -58,7 +58,7 @@ cat > setup-bastion.sh << EOF
 	sudo ansible-galaxy collection install kubernetes.core --upgrade
 
     # install all required packages
-    sudo yum install -y wget jq git net-tools vim tar unzip python3 python3-pip coreos-installer grub2-tools-extra bind-utils 
+    sudo yum install -y wget jq git net-tools vim tar unzip python3 python3-pip python3-jmespath coreos-installer grub2-tools-extra bind-utils 
 
     # install files for PXE
 	sudo grub2-mknetdir --net-directory=/var/lib/tftpboot

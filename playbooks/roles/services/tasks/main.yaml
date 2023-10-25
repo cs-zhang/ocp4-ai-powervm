@@ -82,3 +82,10 @@
       state: stopped
     when: dhcp.api_vip is defined or ( masters | length == 1 and bootstrap is not defined )
     
+  # - name: stop dhcpd when it is not enabled
+  #   become: true
+  #   service:
+  #     name: dhcpd
+  #     state: stopped
+  #   when: not enable_dhcp
+
