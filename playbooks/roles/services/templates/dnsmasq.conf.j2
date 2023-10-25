@@ -43,7 +43,11 @@ addn-hosts=/etc/dnsmasq.d/addnhosts
 dhcp-ignore=tag:!known
 dhcp-leasefile=/var/lib/dnsmasq/dnsmasq.leases
 
-dhcp-range={{ masters[0].ipaddr }},static
+{% if enable_dhcp %}
+#dhcp-range={{ dhcp.subnet.split('/').0 }},static
+{% else %}
+dhcp-range={{ dhcp.subnet.split('/').0 }},static
+{% endif %}
 
 dhcp-option=option:router,{{ dhcp.router }}
 dhcp-option=option:netmask,{{ dhcp.netmask }}
