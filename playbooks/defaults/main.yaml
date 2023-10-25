@@ -17,6 +17,8 @@ enable_remote_rootfs: false
 kubeconfig_file: "{{ workdir }}/auth/kubeconfig"
 # Using static IP
 static_ip: false
+# enable stand along dhcpd
+enable_dhcp: false
 # install squid proxy on bastion
 setup_squid_proxy: false
 squid_http_port: 3128

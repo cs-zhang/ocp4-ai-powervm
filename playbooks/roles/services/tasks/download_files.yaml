@@ -44,7 +44,7 @@
   - name: Preparing OCP client
     when: ocp_client is defined
     block:
-    - name: Downloading OCP4 client
+    - name: "Downloading OCP4 client: {{ ocp_client_base }}/{{ ocp_client_tag }}"
       get_url:
         url: "{{ ocp_client }}"
         dest: /usr/local/src/openshift-client-linux.tar.gz
@@ -59,7 +59,7 @@
   - name: Preparing OCP installer
     when: ocp_installer is defined
     block:
-    - name: Downloading OCP4 Installer
+    - name: "Downloading OCP4 Installer: {{ ocp_client_base }}/{{ ocp_client_tag }}"
       get_url:
         url: "{{ ocp_installer }}"
         dest: /usr/local/src/openshift-install-linux.tar.gz

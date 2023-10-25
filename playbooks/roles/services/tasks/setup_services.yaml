@@ -21,6 +21,14 @@
     notify:
       - restart dnsmasq
 
+  - name: Write out dhcp file
+    template:
+      src: ../templates/dhcpd.conf.j2
+      dest: /etc/dhcp/dhcpd.conf
+    notify:
+      - restart dhcpd
+    when: enable_dhcp
+    
   - name: Write out haproxy config file
     template:
       src: ../templates/haproxy.cfg.j2

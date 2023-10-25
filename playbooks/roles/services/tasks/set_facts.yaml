@@ -34,6 +34,7 @@
         - haproxy
         - httpd
         - httpd-tools
+        - dhcp-server
         - jq
         - bash-completion
         - coreos-installer

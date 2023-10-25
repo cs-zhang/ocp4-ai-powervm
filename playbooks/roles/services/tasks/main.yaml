@@ -61,6 +61,14 @@
     with_items:
       - "{{ services }}"
 
+  - name: start stand along dhcp if it is enabled
+    become: true
+    service: 
+      name: dhcpd
+      enabled: yes
+      state: started
+    when: enable_dhcp
+
   # - name: Set the local resolv.conf file
   #   become: true
   #   template:
@@ -73,5 +81,4 @@
       name: haproxy
       state: stopped
     when: dhcp.api_vip is defined or ( masters | length == 1 and bootstrap is not defined )
-
     
