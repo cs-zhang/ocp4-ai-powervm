@@ -69,11 +69,11 @@
       state: started
     when: enable_dhcp
 
-  # - name: Set the local resolv.conf file
-  #   become: true
-  #   template:
-  #     src: ../templates/resolv.conf.j2
-  #     dest: /etc/resolv.conf
+  - name: Set the local resolv.conf file
+    become: true
+    template:
+      src: ../templates/resolv.conf.j2
+      dest: /etc/resolv.conf
 
   - name: stop haproxy when there is no need
     become: true
