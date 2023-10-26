@@ -56,22 +56,22 @@ dhcp-option=option:domain-name,{{ dns.clusterid }}.{{ dns.domain | lower }}
 #dhcp-option=option:domain-search,{{ dns.domain | lower }}
 
 {% if bootstrap is defined %}
-dhcp-host={{ bootstrap.macaddr }},{{ bootstrap.name | lower }},{{ bootstrap.ipaddr }},infinite
+dhcp-host={{ bootstrap.macaddr }},{{ bootstrap.ipaddr }},{{ bootstrap.name | lower }},infinite
 {% endif %}
 
 {% for m in masters %}
-dhcp-host={{ m.macaddr }},{{ m.name | lower }},{{ m.ipaddr }},infinite
+dhcp-host={{ m.macaddr }},{{ m.ipaddr }},{{ m.name | lower }},infinite
 {% endfor %}
 
 {% if workers is defined and workers | length > 0 %}
 {% for w in workers %}
-dhcp-host={{ w.macaddr }},{{ w.name | lower }},{{ w.ipaddr }},infinite
+dhcp-host={{ w.macaddr }},{{ w.ipaddr }},{{ w.name | lower }},infinite
 {% endfor %}
 {% endif %}
 
 {% if day2_workers is defined and day2_workers | length > 0 %}
 {% for w in day2_workers %}
-dhcp-host={{ w.macaddr }},{{ w.name | lower }},{{ w.ipaddr }},infinite
+dhcp-host={{ w.macaddr }},{{ w.ipaddr }},{{ w.name | lower }},infinite
 {% endfor %}
 {% endif %}
 
