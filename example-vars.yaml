@@ -13,12 +13,7 @@ dhcp:
   router: "192.168.79.2"
   netmask: "255.255.255.0"
   subnet: "192.168.79.0/24"
-# bootstrap: 
-#   name: "bootstrap"
-#   ipaddr: "9.47.89.30"
-#   macaddr: "fa:16:3e:33:8b:e3"
-#   pvmcec: "C340F21U13"
-#   pvmlpar: "cs-pvm-ocp-bo-ed8ba13f-0000022f"
+
 masters:
   - name: "master-1"
     ipaddr: "192.168.79.98"
@@ -45,11 +40,7 @@ masters:
 #     pvmcec: "C340F21U13"
 #     pvmlpar: "cs-ocp-sno-89bf5d67-000072d1"
 #     disk: /dev/sda
-
-###################
-# Day2 tasks: add more workers to cluster
-# day2_workers:
-#   - name: "day2-worker-1"
+#   - name: "worker-2"
 #     ipaddr: "9.47.87.82"
 #     macaddr: "fa:b0:45:27:43:20"
 #     pvmcec: "C340F21U13"
@@ -104,7 +95,7 @@ pvm_hmc: <hmc_user>@<hmc_host>
 #   agent: agent based installer
 #   assisted: assisted installer
 #   sno: normal OCP SNO installation
-#   normal: normal OCP UPI installation, require bootstrap
+#   #normal: normal OCP UPI installation, require bootstrap
 install_type: agent
 
 
