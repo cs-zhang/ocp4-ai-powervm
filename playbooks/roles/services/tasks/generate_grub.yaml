@@ -10,7 +10,7 @@
         ip_config: "ip=dhcp"
 
 - name: create grub2 block for Assisted/Agent/SNO
-  when: (install_type == "assisted") or (install_type == "agent") or (install_type == "sno" and day2_workers is not defined )  
+  when: (install_type == "assisted") or (install_type == "agent") or (install_type == "sno" and day2_workers is not defined)  
   blockinfile:
     marker: ""
     content: |
