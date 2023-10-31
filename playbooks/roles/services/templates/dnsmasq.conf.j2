@@ -54,6 +54,9 @@ dhcp-option=option:netmask,{{ dhcp.netmask }}
 dhcp-option=option:dns-server,{{ helper.ipaddr }}
 dhcp-option=option:domain-name,{{ dns.clusterid }}.{{ dns.domain | lower }}
 #dhcp-option=option:domain-search,{{ dns.domain | lower }}
+{% if dhcp.mtu is define %}
+dhcp-option=option:mtu, {{ dhcp.mtu }}
+{% endif %}
 
 {% if bootstrap is defined %}
 dhcp-host={{ bootstrap.macaddr }},{{ bootstrap.ipaddr }},{{ bootstrap.name | lower }},infinite
