@@ -57,7 +57,7 @@
     service:
       name: "{{ item }}"
       enabled: yes
-      state: started
+      state: restarted
     with_items:
       - "{{ services }}"
 
@@ -66,7 +66,7 @@
     service: 
       name: dhcpd
       enabled: yes
-      state: started
+      state: restarted
     when: enable_dhcp
 
   - name: Set the local resolv.conf file
