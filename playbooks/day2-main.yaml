@@ -2,7 +2,7 @@
 # file: add-workers.yaml
 
 - name: Setup services for bastion
-  hosts: all
+  hosts: bastion
   vars_files:
     - defaults/main.yaml
   handlers:
@@ -16,7 +16,7 @@
   - services
 
 - name: Do day2 tasks to add more workers to exist cluster
-  hosts: all
+  hosts: bastion
   vars_files:
     - defaults/main.yaml
   become: false

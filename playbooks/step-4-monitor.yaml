@@ -1,7 +1,7 @@
 ---
 # file: main.yml
 - name: Update the inventory
-  hosts: localhost
+  hosts: bastion
   gather_facts: false
   any_errors_fatal: true
   roles:
@@ -18,7 +18,7 @@
       include: roles/monitor/tasks/sno-set-boot-order.yaml
 
 - name: Monitor OCP installation progress
-  hosts: localhost
+  hosts: bastion
   vars_files:
     - defaults/main.yaml
   gather_facts: true

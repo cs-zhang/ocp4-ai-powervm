@@ -1,5 +1,5 @@
 ---
-- hosts: all    
+- hosts: bastion
   vars_files:
     - defaults/main.yaml
   vars:
