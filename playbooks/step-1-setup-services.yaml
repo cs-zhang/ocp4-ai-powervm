@@ -1,7 +1,7 @@
 ---
 # file: main.yml
 - name: Setup services for bastion
-  hosts: localhost
+  hosts: bastion
   vars_files:
   - defaults/main.yaml
   handlers:

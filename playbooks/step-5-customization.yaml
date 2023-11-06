@@ -1,6 +1,6 @@
 # file: main.yml
 - name: Monitor OCP installation progress
-  hosts: localhost
+  hosts: bastion
   vars_files:
     - defaults/main.yaml
   gather_facts: false
