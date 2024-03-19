@@ -26,10 +26,6 @@
   # delay: 30
   # retries: 15
 
-# - name: Print out install_status
-#   debug:
-#     msg: "{{ install_status }}"
-    
 - name: Waiting for installation start
   uri:
     url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}"
@@ -59,6 +55,11 @@
     dest: "{{ workdir }}/auth/kubeconfig"
     headers:
       Authorization: "{{ api_token }}"
+
+- name: Install kubeconfig
+  copy:
+    src: "{{ workdir }}/auth/kubeconfig"
+    dest: "~/.kube/config"
 
 - name: Download kubeadmin password
   get_url:

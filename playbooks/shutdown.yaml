@@ -1,7 +1,7 @@
 ---
 # Boot up day2 worker nodes
 
-- hosts: bastion   
+- hosts: localhost   
   tasks:
   - name: Shutdown bootstrap node
     when: bootstrap is defined

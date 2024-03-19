@@ -17,7 +17,7 @@
 
   - set_fact:
       registry_services:
-        - named
+        - dnsmasq
         - firewalld
         - local-registry
 
@@ -33,13 +33,16 @@
         - firewalld
         - haproxy
         - httpd
-        - httpd-tools
         - dhcp-server
         - jq
         - bash-completion
+        - python3-libselinux
         - coreos-installer
         - nfs-utils
         - vim
+        - grub2-tools
+        - grub2-tools-extra
+        - podman
   
 - set_fact:
       services:
@@ -48,10 +51,18 @@
         - haproxy
 
 - set_fact:
+    critical_services:
+      - httpd
+      - dnsmasq
+      - haproxy
+
+- set_fact:
       ports:
         - 67/udp
         - 53/tcp
         - 53/udp
+        - 123/tcp
+        - 123/udp
         - 443/tcp
         - 80/tcp
         - 8080/tcp

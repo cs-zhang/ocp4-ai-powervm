@@ -24,8 +24,19 @@
   service:
     name: squid
     state: restarted
+    daemon_reload: yes
+    enabled: yes
 
 - name: restart firewalld
   service:
     name: firewalld
     state: restarted
+    enabled: yes
+
+- name: restart chrony
+  become: true
+  service:
+    name: chronyd
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
