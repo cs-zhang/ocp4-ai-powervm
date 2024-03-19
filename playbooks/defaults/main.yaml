@@ -1,6 +1,6 @@
 ---
 # defaults file
-
+target: "powervc"
 workdir: ~/workdir-ocp4-ai
 rhcos_arch: ppc64le
 ocp_client_arch: ppc64le
@@ -70,8 +70,17 @@ public_ssh_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 ###################################
 # Variables for customization 
 rhcos_kernel_options: []
+rhcos_pre_kernel_options: []
 sysctl_tuned_options: false
 powervm_rmc: false
+
+########################
+chronyconfig:
+  enabled: true
+  content:
+  - server: "{{ helper.ipaddr }}"
+    options: iburst
+
 
 ########################
 # local registry

@@ -27,6 +27,39 @@
       - master
       - worker
 
+  # - name: Setup network configuration
+  #   template:
+  #     src: ../templates/cluster-network-03-config.yml.j2
+  #     dest: "{{ workdir }}/manifests/cluster-network-03-config.yml"
+  #   when: cni_network_mtu is defined
+ 
+  - name: Configure RHCOS kernel options via MachineConfig before installation
+    when: rhcos_pre_kernel_options | length > 0
+    vars:
+      role_n: '{{ item }}'
+    template:
+      src: preinstall-node-kargs.yaml.j2
+      dest: "{{ workdir }}/manifests/preinstall-{{ item }}-kargs.yaml"
+    with_items:
+      - master
+      - worker
+  
+  - name: Remove the machine yaml files
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_fileglob:
+      - "{{ workdir }}/openshift/99_openshift-cluster-api_master-machines-*.yaml"
+      - "{{ workdir }}/openshift/99_openshift-cluster-api_worker-machineset-*.yaml"
+
+  - name: Make the control-plane un-schedulable
+    lineinfile:
+      path: "{{ workdir }}/manifests/cluster-scheduler-02-config.yml"
+      regexp: '^(.*)mastersSchedulable: true'
+      line: '\1mastersSchedulable: False'
+      backrefs: yes
+    when: workers is defined and workers|length > 0
+
   - name: Create ignition files for normal OCP
     when: install_type == "normal"
     shell: |

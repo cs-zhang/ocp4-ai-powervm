@@ -77,3 +77,13 @@
   become: true
   shell: "restorecon -vR /var/www/html || true"
 
+- name: mkdir ~/.kube
+  file:
+    path: ~/.kube
+    state: directory
+
+- name: Install kubeconfig
+  copy:
+    src: "{{ workdir }}/auth/kubeconfig"
+    dest: "~/.kube/config"
+  when: install_type != "assisted"

@@ -7,7 +7,7 @@
     groups: bastion
 
 - name: check if bootstrap has defined
-  when: (workers is defined) and (workers|length > 0)
+  when: (bootstrap is defined)
   block:
   - name: Add bootstrap to inventory
     add_host:
