@@ -59,7 +59,7 @@ assisted_token: ""
 assisted_ocp_version: "4.16"
 # ISO: minimal-iso or full-iso
 assisted_iso_type: "full-iso"
-assisted_rhcos_version: "4.14"
+assisted_rhcos_version: "4.16"
 assisted_exist_cluster: false
 # deploy with dual IP stack
 assisted_net_dualstack: false
