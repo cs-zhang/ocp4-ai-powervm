@@ -8,16 +8,20 @@ curl -s ${API_URL}/component-versions | jq .
 
 echo "AI OCP versions:"
 curl -s ${API_URL}/openshift-versions | jq .
-OCP_VERSION="4.17.0-ec.3-multi" #$(curl -s ${API_URL}/openshift-versions | jq .display_name)
 
-# echo "AI release sources:"
-# curl -s ${API_URL}/release-sources | jq .
 
-echo "AI  support ARCHs: openshift_version=${OCP_VERSION}"
-curl -s ${API_URL}/support-levels/architectures?openshift_version=${OCP_VERSION} | jq .
+get-addition-info() {
+    OCP_VERSION=$(curl -s ${API_URL}/openshift-versions | jq .display_name)
 
-# echo "AI support features: openshift_version=${OCP_VERSION}"
-# curl -s ${API_URL}/support-levels/features?openshift_version=${OCP_VERSION} | jq .
+    echo "AI release sources:"
+    curl -s ${API_URL}/release-sources | jq .
+
+    echo "AI  support ARCHs: openshift_version=${OCP_VERSION}"
+    curl -s ${API_URL}/support-levels/architectures?openshift_version=${OCP_VERSION} | jq .
+
+    echo "AI support features: openshift_version=${OCP_VERSION}"
+    curl -s ${API_URL}/support-levels/features?openshift_version=${OCP_VERSION} | jq .
+}
 
 get-infra() {
     echo "# Get INFRA_HREF"
