@@ -231,9 +231,11 @@ if [[ "${SERVER_IP}" == "<host_ip>" ]]; then
   exit 1
 fi
 
+echo "SERVER_IP: ${SERVER_IP}"
 if [[ $# -eq 1 && "$1" != "deploy" ]]; then
   destory
 else
   deploy
+  sleep 20
   source ./ai-utils.sh
 fi
