@@ -3,6 +3,8 @@
 #
 # This script is to deploy assisted service on local power system, and it can be used to test any version of OCP release.
 #
+# Environment variables used in script:
+#   SERVER_IP -- the hosts' IP where this script will run on
 
 # check postgrs db:
 #  dnf module -y install postgresql:16
@@ -106,7 +108,7 @@ EOF
 
   export DEFAULT_RELEASE_IMAGES=$(tr -d '\n\t ' < ./deploy_release_images.json) # Or $(cat ./deploy_release_images.json | jq -c .)
   export DEFAULT_OS_IMAGES=$(tr -d '\n\t ' < ./deploy_os_images.json)
-  export SERVER_IP=${SERVER_IP:-9.114.97.105}
+  export SERVER_IP=${SERVER_IP:-"<host_ip>"}
   # export TAG=${CPU_ARCH}
   # ENV_FILE=deploy_assisted_service.env
   # cat ${ENV_FILE}.template | envsubst > ${ENV_FILE}
@@ -209,7 +211,7 @@ deploy() {
   echo "Download openshift-install"
   download_installer # download installer from mirror site
   #get_ocp_release    # download installer from release readme
-  #get_ocp_nightly    # download installer from night build
+  #get_ocp_nightly    # download installer from nightly build
   echo "Setup deploy configure files"
   setup_env
 
@@ -224,6 +226,11 @@ destory() {
 }
 
 ##############################################
+if [[ "${SERVER_IP}" == "<host_ip>" ]]; then
+  echo "SERVER_IP need to be defined before run this script"
+  exit 1
+fi
+
 if [[ $# -eq 1 && "$1" != "deploy" ]]; then
   destory
 else
