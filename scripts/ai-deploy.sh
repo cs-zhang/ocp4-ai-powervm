@@ -10,12 +10,12 @@
 #  dnf module -y install postgresql:16
 #  psql -c "select usename from pg_user;" --host=127.0.0.1 --username=admin --password -d installer
 ##### OCP GA release #####
-#OCP_RELEASE="ocp"
-#OCP_VERSION="latest-4.16"    # GA release
+OCP_RELEASE="ocp"
+OCP_VERSION="latest-4.17"    # GA release
 #OCP_VERSION="candidate-4.17"  # Pre-GA release
 ##### OCP PREVIEW release #####"
-OCP_RELEASE="ocp-dev-preview"
-OCP_VERSION="candidate-4.18"
+# OCP_RELEASE="ocp-dev-preview"
+# OCP_VERSION="candidate-4.18"
 ##### OCP nightly build version #####
 # OCP_RELEASE="nightly"
 # OCP_VERSION="4.17.0"
@@ -29,6 +29,10 @@ download_installer() {
   if [ ! -f "${INSTALLER}" ]; then
       echo "Download installer"
       wget https://mirror.openshift.com/pub/openshift-v4/${CPU_ARCH}/clients/${OCP_RELEASE}/${OCP_VERSION}/openshift-install-linux.tar.gz
+      if [[ ! -f "./openshift-install-linux.tar.gz" ]]; then
+        echo "Could not download openshift-install-linux.tar.gz"
+        exit 1
+      fi
       tar xzvf openshift-install-linux.tar.gz
       rm -f openshift-install-linux.tar.gz README.md
   fi
@@ -38,6 +42,10 @@ get_ocp_release() {
   echo "Download the OCP:${OCP_VERSION} README.txt"
   wget https://mirror.openshift.com/pub/openshift-v4/${CPU_ARCH}/clients/${OCP_RELEASE}/${OCP_VERSION}/release.txt
   export RELEASE_IMAGE_DIGEST=$(cat release.txt | grep "Pull From:" | awk -F" " '{print $3}')
+  if [[ -z ${RELEASE_IMAGE_DIGEST} ]]; then
+    echo "Could not get RELEASE_IMAGE_DIGEST"
+    exit 1
+  fi
   echo "Extract openshift-install from OCP release: ${RELEASE_IMAGE_DIGEST}"
   oc adm release extract ${PULL_SECRECT} --command openshift-install ${RELEASE_IMAGE_DIGEST}
 }
@@ -47,6 +55,10 @@ get_ocp_nightly() {
   # quay.io/openshift/ci:<namespace>_<name>_<tag>
   # registry.ci.openshift.org/ocp-ppc64le/release-ppc64le:4.16.0-0.nightly-ppc64le-2024-08-12-121050
   export RELEASE_IMAGE_DIGEST=$(curl -s https://ppc64le.ocp.releases.ci.openshift.org/api/v1/releasestream/${OCP_VERSION}-0.nightly-ppc64le/latest | jq -r .pullSpec)
+  if [[ -z ${RELEASE_IMAGE_DIGEST} ]]; then
+    echo "Could not get RELEASE_IMAGE_DIGEST"
+    exit 1
+  fi
   echo "Extract openshift-install from OCP release: ${RELEASE_IMAGE_DIGEST}"
   oc adm release extract ${PULL_SECRECT} --command openshift-install ${RELEASE_IMAGE_DIGEST}
 

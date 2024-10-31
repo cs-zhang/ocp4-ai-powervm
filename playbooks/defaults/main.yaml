@@ -19,6 +19,10 @@ kubeconfig_file: "{{ workdir }}/auth/kubeconfig"
 static_ip: false
 # enable stand along dhcpd
 enable_dhcp: false
+# secure http
+secure_http: false
+# secure NFS
+secure_nfs: false
 # install squid proxy on bastion
 setup_squid_proxy: false
 squid_http_port: 3128

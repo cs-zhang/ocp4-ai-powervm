@@ -33,57 +33,57 @@
   retries: 30
   delay: 30
 
-# - name: show host count
-#   debug:
-#     msg: "{{ hosts.json | length }}"
+- name: show host count
+  debug:
+    msg: "{{ hosts.json | length }}"
 
 
-# - name: set role for workers
-#   uri:
-#     url: "{{ assisted_url }}/infra-envs/{{ infraenv_info.id }}/hosts/{{ hosts.json | json_query(query) | first }}"
-#     method: PATCH
-#     headers:
-#       Authorization: "{{ api_token }}"
-#     body_format: json
-#     body: '{ "host_role": "worker" }'
-#     status_code: 201
-#   vars:
-#     query: "[?requested_hostname=='{{ item.name }}' || requested_hostname=='{{ item.name }}.{{ dns.clusterid }}.{{ dns.domain }}'].id"
-#   with_items: "{{ day2_workers }}"
+- name: set role for workers
+  uri:
+    url: "{{ assisted_url }}/infra-envs/{{ infraenv_info.id }}/hosts/{{ hosts.json | json_query(query) | first }}"
+    method: PATCH
+    headers:
+      Authorization: "{{ api_token }}"
+    body_format: json
+    body: '{ "host_role": "worker" }'
+    status_code: 201
+  vars:
+    query: "[?requested_hostname=='{{ item.name }}' || requested_hostname=='{{ item.name }}.{{ dns.clusterid }}.{{ dns.domain }}'].id"
+  with_items: "{{ day2_workers }}"
 
 
-# - name: check day2 workers status
-#   uri:
-#     url: "{{ assisted_url }}/infra-envs/{{ infraenv_info.id }}/hosts/{{ hosts.json | json_query(query) | first }}"
-#     method: GET
-#     body_format: json
-#     return_content: yes
-#     headers:
-#       Authorization: "{{ api_token }}"
-#     status_code: 200
-#   vars:
-#     query: "[?requested_hostname=='{{ item.name }}' || requested_hostname=='{{ item.name }}.{{ dns.clusterid }}.{{ dns.domain }}'].id"
-#   with_items: "{{ day2_workers }}"
-#   register: added_host
-#   until: (added_host.json.status == 'known')
-#   retries: 30
-#   delay: 30
+- name: check day2 workers status
+  uri:
+    url: "{{ assisted_url }}/infra-envs/{{ infraenv_info.id }}/hosts/{{ hosts.json | json_query(query) | first }}"
+    method: GET
+    body_format: json
+    return_content: yes
+    headers:
+      Authorization: "{{ api_token }}"
+    status_code: 200
+  vars:
+    query: "[?requested_hostname=='{{ item.name }}' || requested_hostname=='{{ item.name }}.{{ dns.clusterid }}.{{ dns.domain }}'].id"
+  with_items: "{{ day2_workers }}"
+  register: added_host
+  until: (added_host.json.status == 'known')
+  retries: 30
+  delay: 30
 
-# - name: show host detail
-#   debug:
-#     msg: "{{ added_host.results[0].json.status }}"
+- name: show host detail
+  debug:
+    msg: "{{ added_host.results[0].json.status }}"
 
-# - name: call install action for the day2 workers
-#   uri:
-#     url: "{{ assisted_url }}/infra-envs/{{ infraenv_info.id }}/hosts/{{ hosts.json | json_query(query) | first }}/actions/install"
-#     method: POST
-#     headers:
-#       Authorization: "{{ api_token }}"
-#     status_code: 202
-#   vars:
-#     query: "[?requested_hostname=='{{ item.name }}' || requested_hostname=='{{ item.name }}.{{ dns.clusterid }}.{{ dns.domain }}'].id"
-#   with_items: "{{ day2_workers }}"
-#   register: day2_install_status
+- name: call install action for the day2 workers
+  uri:
+    url: "{{ assisted_url }}/infra-envs/{{ infraenv_info.id }}/hosts/{{ hosts.json | json_query(query) | first }}/actions/install"
+    method: POST
+    headers:
+      Authorization: "{{ api_token }}"
+    status_code: 202
+  vars:
+    query: "[?requested_hostname=='{{ item.name }}' || requested_hostname=='{{ item.name }}.{{ dns.clusterid }}.{{ dns.domain }}'].id"
+  with_items: "{{ day2_workers }}"
+  register: day2_install_status
 
 - name: check day2 workers install done
   uri:

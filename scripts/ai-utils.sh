@@ -1,7 +1,5 @@
 # ! /usr/bin/bash
-# utility calls to get different data from assisted service
 
-API_TOKEN=$(sed  's/"\*/"/g' ~/workdir-ocp4-agent/.openshift_install_state.json | jq -r '."gencrypto.AuthConfig".AgentAuthToken')
 API_URL=http://${SERVER_IP}:8090/api/assisted-install/v2
 
 rest_call() {
@@ -53,7 +51,13 @@ get-clusterid() {
 get-clusters() {
     echo "Cluster status info:"
     rest_call "clusters"
-    echo ${RESULT} | jq '.[] | [.id, .name, .base_dns_domain, .enabled_host_count,  .progress.finalizing_stage_percentage, .status_info]'
+    echo ${RESULT} | jq '.[] | [.id, .name, .base_dns_domain, .enabled_host_count,  .progress.finalizing_stage_percentage, .status, .status_info]'
+}
+
+detail-clusters() {
+    echo "Cluster status info:"
+    rest_call "clusters"
+    echo ${RESULT} | jq '.'
 }
 
 get-infra-envs() {
@@ -90,6 +94,9 @@ else
             ;;
         "clusters")
             get-clusters
+            ;;
+        "detail-clusters")
+            detail-clusters
             ;;
         "hosts")
             get-hosts

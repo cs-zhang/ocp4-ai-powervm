@@ -1,0 +1,12 @@
+{% if bootstrap is defined %}
+/export           {{ bootstrap.ipaddr }}(rw,sync,no_wdelay,no_root_squash,insecure)
+{% endif %}
+{% for m in masters %}
+/export           {{ m.ipaddr }}(rw,sync,no_wdelay,no_root_squash,insecure)
+{% endfor %}
+{% for w in workers %}
+/export           {{ w.ipaddr }}(rw,sync,no_wdelay,no_root_squash,insecure)
+{% endfor %}
+{% for w in day2_workers %}
+/export           {{ w.ipaddr }}(rw,sync,no_wdelay,no_root_squash,insecure)
+{% endfor %}

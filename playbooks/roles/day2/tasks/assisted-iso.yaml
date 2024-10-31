@@ -1,3 +1,7 @@
+---
+- name: Get access Token
+  include_tasks: ../../ignition/tasks/assisted-refresh-token.yaml
+
 - name: Get day1 cluster info from output json file
   set_fact:
     day1_cluster_info: '{{ lookup("file", "{{ workdir }}/assisted-cluster-create-output.json") | from_json }}'
@@ -14,7 +18,20 @@
   debug:
     msg: "{{ day1_infraenv_info.id }}"
 
+- name: Get cluster detail
+  uri:
+    url: "{{ assisted_url }}/clusters/{{ day1_cluster_info.id }}"
+    method: GET
+    headers:
+      accept: application/json
+      Authorization: "{{ api_token }}"
+    return_content: yes
+    status_code: 200
+    validate_certs: "{{ assisted_token != '' }}"
+  register: day2_cluster_json
+
 - name: allow to add new host nodes
+  when: "day2_cluster_json.json.status != 'adding-hosts'"
   uri:
       url: "{{ assisted_url }}/clusters/{{ day1_cluster_info.id }}/actions/allow-add-hosts"
       method: POST
