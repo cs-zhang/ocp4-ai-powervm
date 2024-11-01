@@ -65,7 +65,7 @@
     query: "[?requested_hostname=='{{ item.name }}' || requested_hostname=='{{ item.name }}.{{ dns.clusterid }}.{{ dns.domain }}'].id"
   with_items: "{{ day2_workers }}"
   register: added_host
-  until: (added_host.json.status == 'known')
+  until: (added_host.status|default('None') == 200) and (added_host.json.status == 'known')
   retries: 30
   delay: 30
 
@@ -98,7 +98,7 @@
     query: "[?requested_hostname=='{{ item.name }}' || requested_hostname=='{{ item.name }}.{{ dns.clusterid }}.{{ dns.domain }}'].id"
   with_items: "{{ day2_workers }}"
   register: added_host
-  until: (added_host.json.status == 'added-to-existing-cluster')
+  until: (added_host.status|default('None') == 200) and (added_host.json.status == 'added-to-existing-cluster')
   retries: 120
   delay: 30
 
