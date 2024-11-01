@@ -1,8 +1,8 @@
 ---
 - block:
-    - assert: 
+    - assert:
         that: "{{ helper.networkifacename is defined }}"
-    - set_fact: 
+    - set_fact:
         networkifacename: "{{ helper.networkifacename }}"
   rescue:
     - set_fact:
@@ -43,7 +43,7 @@
         - grub2-tools
         - grub2-tools-extra
         - podman
-  
+
 - set_fact:
       services:
         - dnsmasq
@@ -81,6 +81,7 @@
         - 111/tcp
         - 2049/tcp
         - 3128/tcp
+        - 5000/tcp
         - 20048/tcp
         - 50825/tcp
         - 53248/tcp
