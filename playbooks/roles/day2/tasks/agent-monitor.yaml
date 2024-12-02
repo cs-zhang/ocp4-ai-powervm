@@ -1,4 +1,11 @@
 ---
+# - name: Approve bootstrap CSR
+#   environment:
+#     KUBECONFIG: "{{ kubeconfig_file }}"
+#   shell: |
+#     oc adm node-image monitor --ip-addresses {{ day2_workers[0].ipaddr }}
+
+
 # monitor the installtion progress
 - name: Wait for bootstrap CSR request
   environment:
@@ -6,8 +13,8 @@
   shell: |
     oc get csr | awk '/node-bootstrapper.*Pending/ { print $1 }'
   register: csrName
-  until: (csrName.stdout_lines | length) != 0
-  retries: 50
+  until: (csrName.stdout_lines | length) == (day2_worker_count|int * 2)
+  retries: 60
   delay: 30
 
 - name: Approve bootstrap CSR
@@ -21,10 +28,10 @@
   environment:
     KUBECONFIG: "{{ kubeconfig_file }}"
   shell: |
-     oc get csr | awk  '/day2.*Pending/ { print $1 }'
+     oc get csr | awk  '/.*Pending/ { print $1 }'
   register: nodeCsrName
-  until:  nodeCsrName.stdout|length != 0
-  delay: 30
+  until:  (nodeCsrName.stdout_lines|length) == (day2_worker_count|int)
+  delay: 10
   retries: 60
 
 - name: Approve node CSR

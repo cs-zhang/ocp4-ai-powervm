@@ -1,0 +1,20 @@
+hosts:
+{% for w in day2_workers %}
+- hostname: {{ w.name }}
+  role: worker
+  interfaces:
+     - name: eth0
+       macAddress: {{ w.macaddr }}
+  networkConfig:
+    interfaces:
+      - name: eth0
+        type: ethernet
+        state: up
+        mac-address: {{ w.macaddr }}
+        ipv4:
+          enabled: true
+          dhcp: true
+          address:
+            - ip: {{ w.ipaddr }}
+              prefix-length: {{ dhcp.subnet.split('/').1 }}
+{% endfor %}

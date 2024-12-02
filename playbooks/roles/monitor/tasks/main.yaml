@@ -26,3 +26,8 @@
   service:
     name: httpd
     state: stopped
+
+- name: Install kubeconfig
+  copy:
+    src: "{{ workdir }}/auth/kubeconfig"
+    dest: "~/.kube/config"

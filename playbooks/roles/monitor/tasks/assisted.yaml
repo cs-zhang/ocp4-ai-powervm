@@ -32,6 +32,12 @@
   include_tasks:  assisted-check-installation.yaml
   loop: "{{ range(1,20,1) | list}}"
 
+- name: Download kubeconfig
+  get_url:
+    url: "{{ assisted_url }}/clusters/{{ cluster_info.id }}/downloads/credentials?file_name=kubeconfig"
+    dest: "{{ workdir }}/auth/kubeconfig"
+    headers:
+      Authorization: "{{ api_token }}"
 
 
 

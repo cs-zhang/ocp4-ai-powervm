@@ -10,7 +10,7 @@
         ip_config: "ip=dhcp"
 
 - name: create grub2 block for Assisted/Agent/SNO
-  when: (install_type == "assisted") or (install_type != "normal" and day2_workers is not defined)
+  when: (install_type == "assisted") or ( install_type == "agent" ) or (install_type == "sno" and day2_workers is not defined)
   blockinfile:
     marker: ""
     content: |
@@ -29,7 +29,7 @@
     dest: /var/lib/tftpboot/boot/grub2/grub.cfg
 
 - name: create grub2 block for normal OCP
-  when: (install_type == "normal") or  ((install_type == "sno" or install_type == "agent") and day2_workers is defined and day2_workers|length > 0)
+  when: (install_type == "normal") or  (install_type == "sno" and day2_workers is defined and day2_workers|length > 0)
   block:
   - name: create grub2 block for normal boot
     blockinfile:

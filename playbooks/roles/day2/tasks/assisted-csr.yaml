@@ -4,7 +4,7 @@
   shell: |
     oc get csr | awk '/node-bootstrapper.*Pending/ { print $1 }'
   register: csrName
-  until: (csrName.stdout_lines | length) > 0
+  until: (csrName.stdout_lines|length) == (day2_worker_count|int * 2)
   retries: 60
   delay: 30
 
@@ -19,9 +19,9 @@
   environment:
     KUBECONFIG: "{{ kubeconfig_file }}"
   shell: |
-     oc get csr | awk  '/day2.*Pending/ { print $1 }'
+     oc get csr | awk  '/.*Pending/ { print $1 }'
   register: nodeCsrName
-  until:  nodeCsrName.stdout_lines|length == day2_workers|length
+  until:  (nodeCsrName.stdout_lines|length) == (day2_worker_count|int)
   delay: 30
   retries: 30
 
