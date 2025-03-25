@@ -82,7 +82,7 @@
 
   - name: embed the ignition file to rhcos-live.iso
     when: rhcos_iso is defined and force_ocp_download
-    shell: "coreos-installer iso ignition embed /usr/local/src/rhcos-live-{{ rhcos_arch }}.iso -o rhcos-sno-ign.iso -fi sno.ign"
+    shell: "coreos-installer iso ignition embed /usr/local/src/rhcos-live-{{ rhcos_arch }}.iso -o rhcos-sno-ign.iso -fi master-sno.ign"
     args:
       chdir: "{{ workdir }}"
 
