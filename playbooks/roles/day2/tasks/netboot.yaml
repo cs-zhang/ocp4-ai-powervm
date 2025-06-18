@@ -9,7 +9,7 @@
         pvmlpar={{ item.pvmlpar }}
         pvm_hmc={{ item.pvm_hmc | default(pvm_hmc) }}
         pvm_profile=`ssh -o StrictHostKeyChecking=no ${pvm_hmc} "lssyscfg -r lpar -m ${pvmcec} --filter lpar_names=${pvmlpar} -F curr_profile"`
-        remote_cmd="lpar_netboot -i -D -f -t ent -m ${pvm_mac} -s auto -d auto -S {{ helper.ipaddr }} -C {{ item.ipaddr }} -G {{ dhcp.router }} ${pvmlpar} ${pvm_profile} ${pvmcec}"
+        remote_cmd="lpar_netboot -i -D -f -t ent -m ${pvm_mac} -s auto -d auto -S {{ helper.ipaddr }} -C {{ item.ipaddr }} -G {{ dhcp.router }} -K {{ dhcp.netmask }} ${pvmlpar} ${pvm_profile} ${pvmcec}"
         ssh -o StrictHostKeyChecking=no ${pvm_hmc} "${remote_cmd}"
       with_items: "{{ day2_workers }}"
       register: workers_output
