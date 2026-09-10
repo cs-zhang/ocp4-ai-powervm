@@ -46,7 +46,6 @@ masters:
 #     pvmcec: "C340F21U13"
 #     pvmlpar: "cs-ocp-sno-89bf5d67-000072d1"
 
-
 ########################
 #force_ocp_download: false
 
@@ -98,7 +97,6 @@ pvm_hmc: <hmc_user>@<hmc_host>
 #   #normal: normal OCP UPI installation, require bootstrap
 install_type: agent
 
-
 ####################################
 # the default place for pull-secret and id_rsa.pub, need to use full path
 # pull_secret_file: "/home/user/.openshift/pull-secret"
@@ -109,3 +107,9 @@ install_type: agent
 workdir: "/home/cloud-user/ocp4-{{ install_type }}"
 log_level: info
 
+###################################
+# define the tech_preview and os_image_stream:
+# tech_preview: true | yes | 1
+#os_image_stream: rhel-9 | rhel-10
+#tech_preview: true
+#os_image_stream: "rhel-9"
